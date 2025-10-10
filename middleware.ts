@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   });
   console.log('User middleware session : ', session);
   if (!session) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/sign-in', request.url));
   }
   return NextResponse.next();
 }
