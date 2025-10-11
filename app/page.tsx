@@ -1,14 +1,14 @@
 'use client';
 import Image from 'next/image';
-import { useSession } from '@/lib/auth-client';
+// import { useSession } from '@/lib/auth-client';
 
 export default function Home() {
-  const {
-    data: session,
-    isPending, //loading state
-    error, //error object
-    refetch, //refetch the session
-  } = useSession();
+  // const {
+  //   data: session,
+  //   isPending, //loading state
+  //   error, //error object
+  //   refetch, //refetch the session
+  // } = useSession();
 
   return (
     <>
