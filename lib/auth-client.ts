@@ -6,13 +6,13 @@ export const { signIn, signUp, useSession, signOut, sendVerificationEmail } =
   });
 
 export const googleSignIn = async () => {
-  const data = await signIn.social({
+  return await signIn.social({
     provider: 'google',
   });
 };
 
 export const githubSignIn = async () => {
-  const data = await signIn.social({
+  return await signIn.social({
     provider: 'github',
   });
 };

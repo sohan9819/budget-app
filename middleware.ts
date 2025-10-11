@@ -7,12 +7,25 @@ export async function middleware(request: NextRequest) {
     headers: await headers(),
   });
   console.log('User middleware session : ', session);
-  if (!session) {
-    return NextResponse.redirect(new URL('/sign-in', request.url));
+
+  const pathname = new URL(request.url).pathname;
+
+  if (session) {
+    if (!session.user.emailVerified) {
+      return NextResponse.redirect(new URL('/verify-email', request.url));
+    }
+    if (pathname === '/sign-in' || pathname === '/sign-up') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  } else {
+    if (pathname !== '/sign-in' && pathname !== '/sign-up') {
+      return NextResponse.redirect(new URL('/sign-in', request.url));
+    }
   }
+
   return NextResponse.next();
 }
 export const config = {
   runtime: 'nodejs',
-  matcher: ['/'], // Apply middleware to specific routes
+  matcher: ['/', '/sign-in', '/sign-up'], // Apply middleware to specific routes
 };

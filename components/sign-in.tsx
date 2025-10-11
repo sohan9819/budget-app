@@ -22,15 +22,19 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
+import { redirect } from 'next/navigation';
 
-import { signIn } from '@/server/user';
+// import { signIn } from '@/server/user';
+import { signIn } from '@/lib/auth-client';
 import { toast } from 'sonner';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
+  rememberMe: z.boolean(),
 });
 
 export function SignInForm({
@@ -42,23 +46,37 @@ export function SignInForm({
     defaultValues: {
       email: '',
       password: '',
+      rememberMe: false,
     },
   });
 
   const { isSubmitting } = form.formState;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { email, password } = values;
-    await signIn(email, password)
-      .then(() => {
-        toast.success('Logged in successfully!');
-      })
-      .catch((error) => {
-        toast.error('Failed to login. Please check your credentials.', {
-          description: 'If you do not have an account, please sign up first.',
-        });
-        // console.log('Error : ', error); // TODO: Remove this log in production
-      });
+    const { email, password, rememberMe } = values;
+    await signIn.email(
+      {
+        email,
+        password,
+        rememberMe,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Logged in successfully!');
+          redirect('/');
+        },
+        onError: (ctx) => {
+          // Handle the error
+          if (ctx.error.status === 403) {
+            toast.warning('Please verify your email address', {
+              description: ctx.error.message,
+            });
+          } else {
+            toast.error('Failed to login. Please check your credentials.');
+          }
+        },
+      },
+    );
   }
 
   return (
@@ -100,6 +118,22 @@ export function SignInForm({
                           {...field}
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='rememberMe'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-row'>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel>Remember Me</FormLabel>
                       <FormMessage />
                     </FormItem>
                   )}
