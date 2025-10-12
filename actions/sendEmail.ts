@@ -1,6 +1,7 @@
 import React from 'react';
 import { Resend } from 'resend';
 import VerificationEmail from '@/email/verification-email';
+// import PasswordResetEmail from '@/email/password-reset-email';
 import { getErrorMessage } from '@/lib/utils';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
