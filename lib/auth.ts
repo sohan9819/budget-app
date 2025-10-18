@@ -9,12 +9,26 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url: resetUrl }) => {
+      console.log('Sending password reset email to : ', user);
+      await sendEmail('passwordReset', user.email, {
+        name: user.name,
+        email: user.email,
+        resetUrl,
+      });
+    },
+    // onPasswordReset: async ({ user }) => {
+    //   console.log(`Password for user ${user.email} has been reset.`);
+    // },
   },
   emailVerification: {
     enabled: true,
     sendOnSignUp: true,
-    sendVerificationEmail: async ({ user, url }) => {
-      await sendEmail(user.name, user.email, url);
+    sendVerificationEmail: async ({ user, url: verificationLink }) => {
+      await sendEmail('verification', user.email, {
+        name: user.name,
+        verificationLink,
+      });
     },
   },
   socialProviders: {

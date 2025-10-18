@@ -26,6 +26,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { redirect } from 'next/navigation';
+import { resendVerificationEmail } from '@/utils/helper';
 
 // import { signIn } from '@/server/user';
 import { signIn } from '@/lib/auth-client';
@@ -68,8 +69,12 @@ export function SignInForm({
         onError: (ctx) => {
           // Handle the error
           if (ctx.error.status === 403) {
-            toast.warning('Please verify your email address', {
-              description: ctx.error.message,
+            toast.warning('Please verify your email address.', {
+              description: `${ctx.error.message}. Please click the button to resend the verification email.`,
+              action: {
+                label: 'Resend',
+                onClick: () => resendVerificationEmail(email),
+              },
             });
           } else {
             toast.error('Failed to login. Please check your credentials.');
@@ -105,23 +110,32 @@ export function SignInForm({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name='password'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder='password'
-                          type='password'
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
+                <div className='flex flex-col gap-2'>
+                  <FormField
+                    control={form.control}
+                    name='password'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder='password'
+                            type='password'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Link
+                    href='/forgot-password'
+                    className='underline underline-offset-4 text-xs ml-auto'>
+                    Forgot your password?
+                  </Link>
+                </div>
+
                 <FormField
                   control={form.control}
                   name='rememberMe'
@@ -138,6 +152,7 @@ export function SignInForm({
                     </FormItem>
                   )}
                 />
+
                 <div className='flex flex-col gap-3'>
                   <Button
                     type='submit'
@@ -148,7 +163,7 @@ export function SignInForm({
                   </Button>
                 </div>
               </div>
-              <div className='mt-5 flex items-center justify-center gap-3'>
+              <div className='mt-5 flex items-center justify-center gap-3 flex-wrap'>
                 <Button
                   variant='outline'
                   className='flex-1'

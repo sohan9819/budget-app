@@ -9,16 +9,21 @@ import {
   Preview,
   Section,
   Text,
-  Link,
+  Button,
 } from '@react-email/components';
 import { Tailwind } from '@react-email/tailwind';
 
-type ResetPasswordProps = {
+export type ResetPasswordParams = {
+  name?: string;
   email: string;
   resetUrl: string;
 };
 
-export default function ResetPassword({ email, resetUrl }: ResetPasswordProps) {
+export default function ResetPassword({
+  name,
+  email,
+  resetUrl,
+}: ResetPasswordParams) {
   return (
     <Html>
       <Head />
@@ -29,11 +34,30 @@ export default function ResetPassword({ email, resetUrl }: ResetPasswordProps) {
             <Section className='bg-white borderBlack my-10 px-10 py-4 rounded-md'>
               <Heading className='leading-tight'>Reset your Password</Heading>
               <Text>
-                Hi there {email}, we received a request to reset your password.
-                Click the link below to reset it.
+                <p>Hi {name || 'there'},</p>
+                <p>
+                  We received a request to reset the password for your account
+                  associated with {email} . Click the link below to reset it.
+                </p>
               </Text>
               <Hr />
-              <Link href={resetUrl}>Click here to reset your password</Link>
+              <Button
+                href={resetUrl}
+                className='bg-blue-500 text-white py-2 px-4 rounded-md'>
+                Reset Password
+              </Button>
+              <Text className='text-sm'>
+                <p>
+                  If the button doesn&apos;t work, copy and paste the following
+                  link into your browser
+                </p>
+                {resetUrl}
+              </Text>
+              <Hr />
+              <Text className='mt-4 text-sm'>
+                If you didn&apos;t request a password reset, please ignore this
+                email.
+              </Text>
             </Section>
           </Container>
         </Body>
