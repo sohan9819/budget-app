@@ -1,6 +1,7 @@
-import { auth } from '@/lib/auth';
-import { LogoutButton } from '@/components/logoutButton';
 import { headers } from 'next/headers';
+
+import { LogoutButton } from '@/components/logoutButton';
+import { auth } from '@/lib/auth';
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({

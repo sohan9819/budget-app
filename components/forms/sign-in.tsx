@@ -1,11 +1,14 @@
 'use client';
 
-import { z } from 'zod';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { Loader } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -14,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -22,15 +26,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
-import { redirect } from 'next/navigation';
-import { resendVerificationEmail } from '@/utils/helper';
-
-// import { signIn } from '@/server/user';
 import { signIn } from '@/lib/auth-client';
-import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { resendVerificationEmail } from '@/utils/helper';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),

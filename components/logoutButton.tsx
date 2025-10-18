@@ -1,9 +1,11 @@
 'use client';
 
 import React from 'react';
-import { signOut } from '@/lib/auth-client';
-import { Button } from '@/components/ui/button';
+
 import { redirect } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import { signOut } from '@/lib/auth-client';
 
 export function LogoutButton() {
   return (

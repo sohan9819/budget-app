@@ -49,6 +49,8 @@
     "drizzle-kit": "^0.31.5",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
     "react-email": "4.3.0",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",

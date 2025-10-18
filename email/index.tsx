@@ -1,7 +1,7 @@
-import VerificationEmail from './verification-email';
 import ResetPassword from './reset-password';
-export { VerificationEmail, ResetPassword };
-
-import { VerificationEmailParams } from './verification-email';
 import { ResetPasswordParams } from './reset-password';
+import VerificationEmail from './verification-email';
+import { VerificationEmailParams } from './verification-email';
+
+export { VerificationEmail, ResetPassword };
 export type { VerificationEmailParams, ResetPasswordParams };

@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Resend } from 'resend';
+
 import { VerificationEmail, ResetPassword } from '@/email';
 import type { VerificationEmailParams, ResetPasswordParams } from '@/email';
 import { getErrorMessage } from '@/lib/utils';
