@@ -12,9 +12,9 @@ Closes #<issue_number>
 
 Please ensure the following before requesting a review:
 
-- [ ] Code follows linting rules (`yarn lint`)
-- [ ] Code is properly formatted (`yarn format`)
-- [ ] All tests pass (`yarn test`)
+- [ ] Code follows linting rules (`pnpm lint`)
+- [ ] Code is properly formatted (`pnpm format`)
+- [ ] All tests pass (`pnpm test`)
 - [ ] Added/updated necessary documentation
 - [ ] Verified changes locally in development mode
 
