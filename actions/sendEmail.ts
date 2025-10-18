@@ -1,26 +1,46 @@
 import React from 'react';
 import { Resend } from 'resend';
-import VerificationEmail from '@/email/verification-email';
-// import PasswordResetEmail from '@/email/password-reset-email';
+import { VerificationEmail, ResetPassword } from '@/email';
+import type { VerificationEmailParams, ResetPasswordParams } from '@/email';
 import { getErrorMessage } from '@/lib/utils';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export const sendEmail = async (name: string, email: string, url: string) => {
+const emailTemplates = {
+  verification: {
+    subject: 'Verify your email address',
+    render: ({ name, verificationLink }: VerificationEmailParams) =>
+      React.createElement(VerificationEmail, { name, verificationLink }),
+  },
+  passwordReset: {
+    subject: 'Reset your password',
+    render: ({ name, email, resetUrl }: ResetPasswordParams) =>
+      React.createElement(ResetPassword, { name, email, resetUrl }),
+  },
+};
+
+type EmailTemplates = typeof emailTemplates;
+type TemplateKey = keyof EmailTemplates;
+type TemplateParams<K extends TemplateKey> = Parameters<
+  EmailTemplates[K]['render']
+>[0];
+
+export async function sendEmail<T extends TemplateKey>(
+  type: T,
+  to: string,
+  params: TemplateParams<T>,
+): Promise<{ data?: unknown; error?: string }> {
   try {
+    const template = emailTemplates[type];
     const data = await resend.emails.send({
-      from: 'Budget App - SignIn <onboarding@resend.dev>',
-      to: email,
-      subject: 'Message from Budget App',
-      react: React.createElement(VerificationEmail, {
-        name,
-        verificationLink: url,
-      }),
+      from: process.env.EMAIL_FROM ?? 'Budget App <onboarding@resend.dev>',
+      to,
+      subject: template.subject,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      react: template.render(params as any),
     });
     return { data };
-  } catch (error: unknown) {
-    return {
-      error: getErrorMessage(error),
-    };
+  } catch (error) {
+    return { error: getErrorMessage(error) };
   }
-};
+}

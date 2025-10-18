@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { sendVerificationEmail } from '@/lib/auth-client';
+import { resendVerificationEmail } from '@/utils/helper';
 
 interface VerifyEmailProps {
   email: string;
@@ -17,14 +17,6 @@ interface VerifyEmailProps {
 }
 
 export function VerifyEmail({ email, name }: VerifyEmailProps) {
-  const resendVerificationEmail = () => {
-    // Logic to resend the verification email
-    sendVerificationEmail({
-      email,
-      callbackURL: '/sign-in',
-    });
-    console.log('Resend verification email');
-  };
   return (
     <Card>
       <CardHeader>
@@ -37,7 +29,7 @@ export function VerifyEmail({ email, name }: VerifyEmailProps) {
         <Button
           variant='outline'
           type='button'
-          onClick={resendVerificationEmail}>
+          onClick={() => resendVerificationEmail(email)}>
           Resend Verification Email
         </Button>
         <Button variant='link' className='mt-2'>

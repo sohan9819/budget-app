@@ -13,7 +13,7 @@ import {
 } from '@react-email/components';
 import { Tailwind } from '@react-email/tailwind';
 
-type VerificationEmailProps = {
+export type VerificationEmailParams = {
   name: string;
   verificationLink: string;
 };
@@ -21,7 +21,7 @@ type VerificationEmailProps = {
 export default function VerificationEmail({
   name,
   verificationLink,
-}: VerificationEmailProps) {
+}: VerificationEmailParams) {
   return (
     <Html>
       <Head />
