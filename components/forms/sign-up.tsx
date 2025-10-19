@@ -5,7 +5,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -27,6 +26,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { VerifyEmail } from '@/components/verify-email';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { signUp } from '@/lib/auth-client';
@@ -172,7 +172,7 @@ export function SignUpForm({
                       className='w-full flex items-center justify-center'
                       disabled={isSubmitting}>
                       Create Account
-                      {isSubmitting && <Loader className='animate-spin' />}
+                      {isSubmitting && <Spinner />}
                     </Button>
                   </div>
                 </div>

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -27,6 +26,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { signIn } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
@@ -83,6 +83,21 @@ export function SignInForm({
       },
     );
   }
+
+  const googleSignInHandler = () => {
+    toast.promise(googleSignIn(), {
+      loading: 'Redirecting to Google...',
+      success: 'Successfully redirected to Google!',
+      error: 'Failed to redirected to Google.',
+    });
+  };
+  const githubSignInHandler = () => {
+    toast.promise(githubSignIn(), {
+      loading: 'Redirecting to Github...',
+      success: 'Successfully redirected to Github!',
+      error: 'Failed to redirected to Github.',
+    });
+  };
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
@@ -159,7 +174,7 @@ export function SignInForm({
                     className='w-full flex items-center justify-center'
                     disabled={isSubmitting}>
                     Login
-                    {isSubmitting && <Loader className='animate-spin' />}
+                    {isSubmitting && <Spinner />}
                   </Button>
                 </div>
               </div>
@@ -168,14 +183,14 @@ export function SignInForm({
                   variant='outline'
                   className='flex-1'
                   type='button'
-                  onClick={googleSignIn}>
+                  onClick={googleSignInHandler}>
                   Login with Google
                 </Button>
                 <Button
                   variant='outline'
                   className='flex-1'
                   type='button'
-                  onClick={githubSignIn}>
+                  onClick={githubSignInHandler}>
                   Login with Github
                 </Button>
               </div>
