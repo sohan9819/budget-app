@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useAtom, atom } from 'jotai';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -32,11 +33,15 @@ import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { signIn } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
+import { PasswordInput } from '../password-input';
+
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   rememberMe: z.boolean(),
 });
+
+const passwordVisibleAtom = atom(false);
 
 export function SignInForm({
   className,
@@ -50,8 +55,10 @@ export function SignInForm({
       rememberMe: false,
     },
   });
-
   const { isSubmitting } = form.formState;
+  const [isPasswordVisible, setIsPasswordVisible] =
+    useAtom(passwordVisibleAtom);
+  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { email, password, rememberMe } = values;
@@ -64,11 +71,10 @@ export function SignInForm({
       {
         onSuccess: () => {
           toast.success('Logged in successfully!');
-          redirect('/');
+          router.replace('/');
         },
         onError: (ctx) => {
-          // Handle the error
-          if (ctx.error.status === 403) {
+          if (ctx.error.code === 'EMAIL_NOT_VERIFIED') {
             toast.warning('Please verify your email address.', {
               description: `${ctx.error.message}. Please click the button to resend the verification email.`,
               action: {
@@ -77,7 +83,9 @@ export function SignInForm({
               },
             });
           } else {
-            toast.error('Failed to login. Please check your credentials.');
+            toast.error('Failed to login', {
+              description: `${ctx.error.message}`,
+            });
           }
         },
       },
@@ -134,9 +142,12 @@ export function SignInForm({
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             placeholder='password'
-                            type='password'
+                            visibility={isPasswordVisible}
+                            onChangeVisibility={() =>
+                              setIsPasswordVisible((prev) => !prev)
+                            }
                             {...field}
                           />
                         </FormControl>
