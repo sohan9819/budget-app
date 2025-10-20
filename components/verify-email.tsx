@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { resendVerificationEmail } from '@/utils/helper';
+import { resendVerificationEmail } from '@/helper';
 
 interface VerifyEmailProps {
   email: string;

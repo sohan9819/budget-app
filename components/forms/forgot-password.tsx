@@ -47,25 +47,38 @@ export function ForgotPasswordForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { email } = values;
-    console.log(email);
-    await forgetPassword({ email, redirectTo: '/reset-password' })
-      .then(() => {
-        form.reset();
-        toast.success('Sent password reset email', {
-          description: 'Please check your inbox',
-        });
-      })
-      .catch((error) => {
-        toast.error('Something went wrong', {
-          description: getErrorMessage(error),
-          action: {
-            label: 'Retry',
-            onClick: () => {
-              onSubmit(values);
+    await forgetPassword(
+      { email, redirectTo: '/reset-password' },
+      {
+        onSuccess: (ctx) => {
+          form.reset();
+          toast.success('Sent password reset email', {
+            description: ctx.data.message,
+          });
+        },
+        onError: (ctx) => {
+          toast.error('Something went wrong', {
+            description: ctx.error.message,
+            action: {
+              label: 'Retry',
+              onClick: () => {
+                onSubmit(values);
+              },
             },
+          });
+        },
+      },
+    ).catch((error) => {
+      toast.error('Something went wrong', {
+        description: getErrorMessage(error),
+        action: {
+          label: 'Retry',
+          onClick: () => {
+            onSubmit(values);
           },
-        });
+        },
       });
+    });
   }
 
   return (

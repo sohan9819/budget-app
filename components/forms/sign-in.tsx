@@ -27,10 +27,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
+import { resendVerificationEmail } from '@/helper';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { signIn } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
-import { resendVerificationEmail } from '@/utils/helper';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),

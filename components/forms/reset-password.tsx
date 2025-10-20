@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { resetPassword } from '@/lib/auth-client';
-import { cn } from '@/lib/utils';
+import { cn, getErrorMessage } from '@/lib/utils';
 
 const formSchema = z
   .object({
@@ -72,7 +72,6 @@ export function ResetPasswordForm({
           redirect('/sign-in');
         },
         onError: (ctx) => {
-          console.log('Reset Password Error Callback : ', ctx.error);
           if (ctx.error.code === 'INVALID_TOKEN') {
             toast.error('The reset token is invalid or has expired.', {
               description: 'Please request a new password reset link.',
@@ -85,11 +84,37 @@ export function ResetPasswordForm({
               },
             });
           } else {
-            toast.error('An error occurred while resetting the password.');
+            toast.error('An error occurred while resetting the password.', {
+              action: {
+                label: 'Retry',
+                onClick: () => {
+                  toast.promise(() => onSubmit(values), {
+                    loading: 'Retrying...',
+                    success:
+                      'Password has been reset successfully. Please sign in.',
+                    error: 'An error occurred while resetting the password.',
+                  });
+                },
+              },
+            });
           }
         },
       },
-    );
+    ).catch((error) => {
+      toast.error('Something went wrong', {
+        description: getErrorMessage(error),
+        action: {
+          label: 'Retry',
+          onClick: () => {
+            toast.promise(() => onSubmit(values), {
+              loading: 'Retrying...',
+              success: 'Password has been reset successfully. Please sign in.',
+              error: 'An error occurred while resetting the password.',
+            });
+          },
+        },
+      });
+    });
   }
 
   return (

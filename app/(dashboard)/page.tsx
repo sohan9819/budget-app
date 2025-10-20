@@ -1,26 +1,25 @@
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+'use client';
 
-import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
 
-import { LogoutButton } from '@/components/buttons/logout-button';
-import { AuthProvider } from '@/components/providers/auth-provider';
-import { auth } from '@/lib/auth';
+import { useAtomValue } from 'jotai';
 
-export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+import { authUserAtom } from '@/atoms/authAtom';
+import { Spinner } from '@/components/ui/spinner';
 
-  if (!session?.session || !session?.user) {
-    toast.error('You must be logged in to access the dashboard.');
-    redirect('/signin');
+export default function DashboardPage() {
+  const user = useAtomValue(authUserAtom);
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // return a placeholder/skeleton to avoid hydration mismatch
+    return <Spinner />;
   }
 
-  return (
-    <AuthProvider session={session.session} user={session.user}>
-      <h1>Welcome {session.user.name}</h1>
-      <LogoutButton />
-    </AuthProvider>
-  );
+  return <h1>Welcome {user?.name}</h1>;
 }

@@ -32,7 +32,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
-      {/* TODO : Handle dark mode */}
+      <head>
+        <meta name='apple-mobile-web-app-title' content='Budget Tracker App' />
+      </head>
       <body className={`${roboto.variable} ${robotoMono.variable} antialiased`}>
         <Provider>
           <ThemeProvider
