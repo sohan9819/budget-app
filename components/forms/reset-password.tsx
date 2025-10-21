@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
@@ -56,6 +56,7 @@ export function ResetPasswordForm({
   });
 
   const { isSubmitting } = form.formState;
+  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { password } = values;
@@ -69,7 +70,7 @@ export function ResetPasswordForm({
           toast.success(
             'Password has been reset successfully. Please sign in.',
           );
-          redirect('/sign-in');
+          router.push('/sign-in');
         },
         onError: (ctx) => {
           if (ctx.error.code === 'INVALID_TOKEN') {
@@ -79,7 +80,7 @@ export function ResetPasswordForm({
                 label: 'Request New',
                 onClick: () => {
                   toast.dismiss();
-                  redirect('/forgot-password');
+                  router.push('/forgot-password');
                 },
               },
             });
