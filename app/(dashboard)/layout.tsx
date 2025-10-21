@@ -21,11 +21,11 @@ export default async function AppLayout({
     redirect('/signin');
   }
   return (
-    <div className='relative flex h-screen w-full flex-col'>
-      <AuthProvider session={session.session} user={session.user}>
+    <AuthProvider session={session.session} user={session.user}>
+      <div className='relative flex h-screen w-full flex-col'>
         <Navbar />
         <div className='w-full max-w-sm'>{children}</div>
-      </AuthProvider>
-    </div>
+      </div>
+    </AuthProvider>
   );
 }

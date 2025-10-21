@@ -5,7 +5,7 @@ import { Menu } from 'lucide-react';
 
 import { AuthButton } from '@/components/buttons/auth-button';
 import { ThemeSwitcherButton } from '@/components/buttons/theme-switcher-button';
-import Logo from '@/components/logo';
+import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -23,9 +23,10 @@ import { NavbarItem } from './navbar-item';
 
 export const MobileNavbar = () => {
   const [isOpen, setIsOpen] = useAtom(isNavbarOpenAtom);
+
   return (
     <div className='block border-separate bg-background md:hidden'>
-      <nav className='container flex items-center justify-between px-4'>
+      <nav className='flex items-center justify-between px-4'>
         <div className='flex-1 flex justify-start items-center gap-2'>
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>

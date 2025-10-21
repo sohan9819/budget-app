@@ -3,9 +3,10 @@
 
 import React, { useEffect } from 'react';
 
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { useSetAtom } from 'jotai';
+import { useHydrateAtoms } from 'jotai/utils';
 import { toast } from 'sonner';
 
 import { authSessionAtom, authUserAtom } from '@/atoms/authAtom';
@@ -24,29 +25,56 @@ export function AuthProvider({
   session,
   user,
 }: SessionProviderProps) {
+  useHydrateAtoms([
+    [authSessionAtom, session],
+    [authUserAtom, user],
+  ]);
+
   const { data: clientSession, isPending, error } = useSession();
   const setSession = useSetAtom(authSessionAtom);
   const setUser = useSetAtom(authUserAtom);
 
+  const router = useRouter();
+
+  // ✅ Initialize from server data
   useEffect(() => {
     if (session && user) {
       setSession(session);
       setUser(user);
     }
+  }, [session, user, setSession, setUser]);
 
-    if (error) {
-      console.log('Auth Session Error : ', error);
-    }
+  // ✅ Sync client session updates
+  // This could be only needed when update user profile features are added
+  // useEffect(() => {
+  //   if (clientSession?.session && clientSession?.user) {
+  //     setSession(clientSession.session);
+  //     setUser(clientSession.user);
+  //   }
+  // }, [clientSession, setSession, setUser]);
 
-    if (!session && !clientSession?.session && !isPending) {
+  // ✅ Handle logout / invalid session
+  useEffect(() => {
+    if (!isPending && !session && !clientSession?.session) {
       setSession(null);
       setUser(null);
-      toast.message('You have been logged out.', {
-        description: 'Please sign in to continue using the application.',
+      console.log('Cleared Auth State');
+      toast.error('You have been logged out.', {
+        description: 'Please sign in to continue.',
       });
-      redirect('/signin');
+      router.push('/signin');
     }
-  }, [clientSession, session, user, isPending, error, setSession, setUser]);
+  }, [isPending, session, clientSession, setSession, setUser, router]);
 
-  return <>{children}</>;
+  // ✅ Handle session errors gracefully
+  useEffect(() => {
+    if (error) {
+      // console.error('Better Auth session error:', error);
+      toast.error('Better Auth session error:', {
+        description: error.message,
+      });
+    }
+  }, [error]);
+
+  return children;
 }

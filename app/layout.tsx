@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang='en' style={{ colorScheme: 'dark' }} suppressHydrationWarning>
       <head>
         <meta name='apple-mobile-web-app-title' content='Budget Tracker App' />
       </head>

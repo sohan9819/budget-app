@@ -2,7 +2,7 @@ import React from 'react';
 
 import { AuthButton } from '@/components/buttons/auth-button';
 import { ThemeSwitcherButton } from '@/components/buttons/theme-switcher-button';
-import Logo from '@/components/logo';
+import { Logo } from '@/components/logo';
 
 import { NavbarItem } from './navbar-item';
 import { navlinks } from '../constants';
@@ -12,7 +12,8 @@ export const DesktopNavbar = () => {
     <div className='hidden border-separate border-b bg-background md:flex md:justify-center md:items-center'>
       <nav className='container flex items-center justify-between px-8'>
         <div className='flex gap-4 h-[80px] min-h-[60px]'>
-          <Logo />
+          <Logo variant='compact' className='hidden md:flex lg:hidden' />
+          <Logo className='hidden lg:flex my-auto' />
           <div className='flex h-full'>
             {navlinks.map((item, index) => (
               <NavbarItem key={index} {...item} className='text-3xl' />

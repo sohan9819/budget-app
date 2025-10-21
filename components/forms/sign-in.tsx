@@ -4,11 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAtom, atom } from 'jotai';
+import { useAtom, atom, useSetAtom } from 'jotai';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { authUserAtom } from '@/atoms/authAtom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -31,6 +32,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { resendVerificationEmail } from '@/helper';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { signIn } from '@/lib/auth-client';
+import { getErrorMessage } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 import { PasswordInput } from '../password-input';
@@ -58,38 +60,55 @@ export function SignInForm({
   const { isSubmitting } = form.formState;
   const [isPasswordVisible, setIsPasswordVisible] =
     useAtom(passwordVisibleAtom);
+
+  const setUser = useSetAtom(authUserAtom);
   const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { email, password, rememberMe } = values;
-    await signIn.email(
-      {
-        email,
-        password,
-        rememberMe,
-      },
-      {
-        onSuccess: () => {
-          toast.success('Logged in successfully!');
-          router.replace('/');
+    await signIn
+      .email(
+        {
+          email,
+          password,
+          rememberMe,
         },
-        onError: (ctx) => {
-          if (ctx.error.code === 'EMAIL_NOT_VERIFIED') {
-            toast.warning('Please verify your email address.', {
-              description: `${ctx.error.message}. Please click the button to resend the verification email.`,
-              action: {
-                label: 'Resend',
-                onClick: () => resendVerificationEmail(email),
-              },
-            });
-          } else {
-            toast.error('Failed to login', {
-              description: `${ctx.error.message}`,
-            });
-          }
+        {
+          onSuccess: (ctx) => {
+            console.log('Signin User : ', ctx);
+            setUser(ctx.data.user);
+            toast.success('Logged in successfully!');
+            router.push('/');
+          },
+          onError: (ctx) => {
+            if (ctx.error.code === 'EMAIL_NOT_VERIFIED') {
+              toast.warning('Please verify your email address.', {
+                description: `${ctx.error.message}. Please click the button to resend the verification email.`,
+                action: {
+                  label: 'Resend',
+                  onClick: () => resendVerificationEmail(email),
+                },
+              });
+            } else {
+              toast.error('Failed to login', {
+                description: `${ctx.error.message}`,
+              });
+            }
+          },
         },
-      },
-    );
+      )
+      .catch((error) => {
+        toast.dismiss();
+        toast.error('Unable to SignIn.', {
+          description: `${getErrorMessage(
+            error,
+          )}. Please click the button to retry.`,
+          action: {
+            label: 'Retry',
+            onClick: () => onSubmit(values),
+          },
+        });
+      });
   }
 
   const googleSignInHandler = () => {

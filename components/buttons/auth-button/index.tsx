@@ -48,7 +48,7 @@ export function AuthButton() {
           toast.success('Logout successful.');
           setAuthUser(null);
           setAuthSession(null);
-          router.push('/sign-in');
+          router.replace('/sign-in');
         },
         onError: (ctx) => {
           if (ctx.error.code === 'FAILED_TO_GET_SESSION') {
@@ -58,7 +58,7 @@ export function AuthButton() {
             });
             setAuthUser(null);
             setAuthSession(null);
-            router.push('/sign-in');
+            router.replace('/sign-in');
           } else {
             toast.error('Unable to log out.', {
               description: `${ctx.error.message}. Please click the button to retry.`,
@@ -175,32 +175,33 @@ export function AuthButton() {
             <User /> {user?.name || <Spinner />}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className='w-56' align='start'>
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuLabel className='text-muted-foreground'>
-            {user?.email}
-          </DropdownMenuLabel>
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Button
-                variant='destructive'
-                className='w-full flex flex-row flex-nowrap justify-between items-center'
-                onClick={() => setIsDeleteAlertOpen(true)}>
-                Delete Account <Trash className='text-background' />
-              </Button>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Button
-                variant={'outline'}
-                //   onClick={signOutHandler}
-                onClick={() => setIsLogoutAlertOpen(true)}
-                className='w-full flex flex-row flex-nowrap justify-between items-center'>
-                <span>Log Out</span>
-                <LogOut className='text-foreground' />
-              </Button>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
+        {user && (
+          <DropdownMenuContent className='w-56' align='start'>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel className='text-muted-foreground'>
+              {user.email}
+            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <Button
+                  variant='destructive'
+                  className='w-full flex flex-row flex-nowrap justify-between items-center'
+                  onClick={() => setIsDeleteAlertOpen(true)}>
+                  Delete Account <Trash className='text-background' />
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Button
+                  variant={'outline'}
+                  onClick={() => setIsLogoutAlertOpen(true)}
+                  className='w-full flex flex-row flex-nowrap justify-between items-center'>
+                  <span>Log Out</span>
+                  <LogOut className='text-foreground' />
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        )}
       </DropdownMenu>
     </>
   );
