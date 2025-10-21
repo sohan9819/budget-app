@@ -1,11 +1,13 @@
 'use client';
 
-import { z } from 'zod';
 import Link from 'next/link';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { Loader } from 'lucide-react';
-import { cn, getErrorMessage } from '@/lib/utils';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -24,7 +26,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { forgetPassword } from '@/lib/auth-client';
-import { toast } from 'sonner';
+import { cn, getErrorMessage } from '@/lib/utils';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -45,25 +47,38 @@ export function ForgotPasswordForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { email } = values;
-    console.log(email);
-    await forgetPassword({ email, redirectTo: '/reset-password' })
-      .then(() => {
-        form.reset();
-        toast.success('Sent password reset email', {
-          description: 'Please check your inbox',
-        });
-      })
-      .catch((error) => {
-        toast.error('Something went wrong', {
-          description: getErrorMessage(error),
-          action: {
-            label: 'Retry',
-            onClick: () => {
-              onSubmit(values);
+    await forgetPassword(
+      { email, redirectTo: '/reset-password' },
+      {
+        onSuccess: (ctx) => {
+          form.reset();
+          toast.success('Sent password reset email', {
+            description: ctx.data.message,
+          });
+        },
+        onError: (ctx) => {
+          toast.error('Something went wrong', {
+            description: ctx.error.message,
+            action: {
+              label: 'Retry',
+              onClick: () => {
+                onSubmit(values);
+              },
             },
+          });
+        },
+      },
+    ).catch((error) => {
+      toast.error('Something went wrong', {
+        description: getErrorMessage(error),
+        action: {
+          label: 'Retry',
+          onClick: () => {
+            onSubmit(values);
           },
-        });
+        },
       });
+    });
   }
 
   return (

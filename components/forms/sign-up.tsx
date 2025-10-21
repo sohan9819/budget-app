@@ -1,11 +1,14 @@
 'use client';
 
-import { z } from 'zod';
+import { useState } from 'react';
+
 import Link from 'next/link';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Loader } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -23,13 +26,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
 import { VerifyEmail } from '@/components/verify-email';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
-
-// import { signUp } from '@/server/user';
 import { signUp } from '@/lib/auth-client';
-import { toast } from 'sonner';
-import { useState } from 'react';
+import { cn, getErrorMessage } from '@/lib/utils';
 
 const formSchema = z
   .object({
@@ -64,29 +65,46 @@ export function SignUpForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { name, email, password } = values;
-    await signUp.email(
-      {
-        name,
-        email,
-        password,
-      },
-      {
-        onSuccess: (message) => {
-          console.log('Sign up success message : ', message);
-          toast.success('Account created successfully!', {
-            description: 'Please check your mail to verify your email address',
-          });
-          setVerifyEmail(true);
-          // redirect('/sign-in'); // Redirect to sign-in page after successful sign up
+    await signUp
+      .email(
+        {
+          name,
+          email,
+          password,
         },
-        onError: () => {
-          toast.error('Failed to create account. Please try again.', {
-            description:
-              'If you already have an account, please sign in instead.',
-          });
+        {
+          onSuccess: () => {
+            toast.success('Account created successfully!', {
+              description:
+                'Please check your mail to verify your email address',
+            });
+            setVerifyEmail(true);
+          },
+          onError: () => {
+            toast.error('Failed to create account', {
+              description:
+                'If you already have an account, please sign in instead.',
+              action: {
+                label: 'Retry',
+                onClick: () => {
+                  onSubmit(values);
+                },
+              },
+            });
+          },
         },
-      },
-    );
+      )
+      .catch((error) => {
+        toast.error('Failed to create account', {
+          description: getErrorMessage(error),
+          action: {
+            label: 'Retry',
+            onClick: () => {
+              onSubmit(values);
+            },
+          },
+        });
+      });
   }
 
   return (
@@ -171,7 +189,7 @@ export function SignUpForm({
                       className='w-full flex items-center justify-center'
                       disabled={isSubmitting}>
                       Create Account
-                      {isSubmitting && <Loader className='animate-spin' />}
+                      {isSubmitting && <Spinner />}
                     </Button>
                   </div>
                 </div>

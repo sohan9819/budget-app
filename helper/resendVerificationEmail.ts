@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+
 import { sendVerificationEmail } from '@/lib/auth-client';
 
 export const resendVerificationEmail = (email: string) => {

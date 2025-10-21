@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {
   Html,
   Body,
@@ -10,6 +11,7 @@ import {
   Section,
   Text,
   Link,
+  Button,
 } from '@react-email/components';
 import { Tailwind } from '@react-email/tailwind';
 
@@ -38,9 +40,22 @@ export default function VerificationEmail({
                 verify your email address by clicking the link below.
               </Text>
               <Hr />
-              <Link href={verificationLink}>
-                Click here to verify your email
-              </Link>
+              <Button
+                href={verificationLink}
+                className='bg-blue-500 text-white py-2 px-4 rounded-md'>
+                Verify Email
+              </Button>
+              <Text className='text-sm'>
+                <p>
+                  If the button doesn&apos;t work, copy and paste the following
+                  link into your browser
+                </p>
+                <Link href={verificationLink}>{verificationLink}</Link>
+              </Text>
+              <Hr />
+              <Text className='mt-4 text-sm'>
+                If you didn&apos;t request this email, please ignore it.
+              </Text>
             </Section>
           </Container>
         </Body>

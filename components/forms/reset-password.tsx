@@ -1,11 +1,14 @@
 'use client';
 
-import { z } from 'zod';
 import Link from 'next/link';
+import { redirect, useSearchParams } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { Loader } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -23,9 +26,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { redirect, useSearchParams } from 'next/navigation';
 import { resetPassword } from '@/lib/auth-client';
-import { toast } from 'sonner';
+import { cn, getErrorMessage } from '@/lib/utils';
 
 const formSchema = z
   .object({
@@ -70,7 +72,6 @@ export function ResetPasswordForm({
           redirect('/sign-in');
         },
         onError: (ctx) => {
-          console.log('Reset Password Error Callback : ', ctx.error);
           if (ctx.error.code === 'INVALID_TOKEN') {
             toast.error('The reset token is invalid or has expired.', {
               description: 'Please request a new password reset link.',
@@ -83,11 +84,37 @@ export function ResetPasswordForm({
               },
             });
           } else {
-            toast.error('An error occurred while resetting the password.');
+            toast.error('An error occurred while resetting the password.', {
+              action: {
+                label: 'Retry',
+                onClick: () => {
+                  toast.promise(() => onSubmit(values), {
+                    loading: 'Retrying...',
+                    success:
+                      'Password has been reset successfully. Please sign in.',
+                    error: 'An error occurred while resetting the password.',
+                  });
+                },
+              },
+            });
           }
         },
       },
-    );
+    ).catch((error) => {
+      toast.error('Something went wrong', {
+        description: getErrorMessage(error),
+        action: {
+          label: 'Retry',
+          onClick: () => {
+            toast.promise(() => onSubmit(values), {
+              loading: 'Retrying...',
+              success: 'Password has been reset successfully. Please sign in.',
+              error: 'An error occurred while resetting the password.',
+            });
+          },
+        },
+      });
+    });
   }
 
   return (

@@ -1,7 +1,13 @@
 import React from 'react';
+
 import { Resend } from 'resend';
-import { VerificationEmail, ResetPassword } from '@/email';
-import type { VerificationEmailParams, ResetPasswordParams } from '@/email';
+
+import { VerificationEmail, ResetPassword, DeleteAccount } from '@/email';
+import type {
+  VerificationEmailParams,
+  ResetPasswordParams,
+  DeleteAccountParams,
+} from '@/email';
 import { getErrorMessage } from '@/lib/utils';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -16,6 +22,14 @@ const emailTemplates = {
     subject: 'Reset your password',
     render: ({ name, email, resetUrl }: ResetPasswordParams) =>
       React.createElement(ResetPassword, { name, email, resetUrl }),
+  },
+  deleteAccount: {
+    subject: 'Confirm your account deletion',
+    render: ({ name, deleteAccountLink }: DeleteAccountParams) =>
+      React.createElement(DeleteAccount, {
+        name,
+        deleteAccountLink,
+      }),
   },
 };
 

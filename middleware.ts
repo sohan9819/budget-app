@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { auth } from '@/lib/auth';
 
-const ROOT_REGEX = /^\/$/;
+// const ROOT_REGEX = /^\/$/;
 const AUTH_PAGES_REGEX =
   /^\/(sign-in|sign-up|forgot-password|reset-password)\/?$/;
 
@@ -12,12 +13,13 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  console.log('User Session : ', session);
-
   if (session) {
     // Signed-in users should not see "/", "/sign-in", or "/sign-up"
-    if (ROOT_REGEX.test(pathname) || AUTH_PAGES_REGEX.test(pathname)) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+    // if (ROOT_REGEX.test(pathname) || AUTH_PAGES_REGEX.test(pathname))
+
+    // Signed-in users should not see "/sign-in", or "/sign-up"
+    if (AUTH_PAGES_REGEX.test(pathname)) {
+      return NextResponse.redirect(new URL('/', request.url));
     }
     return NextResponse.next();
   }

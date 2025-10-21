@@ -1,11 +1,51 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { db } from '@/db/drizzle'; // your drizzle instance
 import { nextCookies } from 'better-auth/next-js';
-import { schema } from '@/db/schema';
-import { sendEmail } from '@/actions/sendEmail';
 
+import { sendEmail } from '@/actions/sendEmail';
+import { db } from '@/db/drizzle';
+import { schema } from '@/db/schema';
+
+// Better Auth Config Options : https://www.better-auth.com/docs/reference/options
 export const auth = betterAuth({
+  secret: process.env.BETTER_AUTH_SECRET,
+  trustedOrigins:
+    process.env.NODE_ENV === 'production'
+      ? [process.env.BETTER_AUTH_URL as string]
+      : [
+          'http://192.168.1.18:3000',
+          'http://localhost:3000', // For local development
+          // 'myapp://', // For deep linking in mobile apps
+        ],
+  logger: {
+    disabled: false,
+    disableColors: false,
+    level: 'info',
+    log: (level, message, ...args) => {
+      // Custom logging implementation
+      console.log(`[${level}] ${message}`, ...args);
+    },
+  },
+  rateLimit: {
+    enabled: true,
+    window: 10,
+    max: 50,
+  },
+  user: {
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({
+        user,
+        url: deleteAccountLink,
+      }) => {
+        console.log('Sending verification to delete user, email to : ', user);
+        await sendEmail('deleteAccount', user.email, {
+          name: user.name,
+          deleteAccountLink,
+        });
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
@@ -17,9 +57,6 @@ export const auth = betterAuth({
         resetUrl,
       });
     },
-    // onPasswordReset: async ({ user }) => {
-    //   console.log(`Password for user ${user.email} has been reset.`);
-    // },
   },
   emailVerification: {
     enabled: true,

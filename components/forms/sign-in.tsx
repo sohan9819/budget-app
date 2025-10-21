@@ -1,11 +1,15 @@
 'use client';
 
-import { z } from 'zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useAtom, atom, useSetAtom } from 'jotai';
 import { useForm } from 'react-hook-form';
-import { Loader } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+import { authUserAtom } from '@/atoms/authAtom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -14,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -22,21 +27,23 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import { resendVerificationEmail } from '@/helper';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
-import { redirect } from 'next/navigation';
-import { resendVerificationEmail } from '@/utils/helper';
-
-// import { signIn } from '@/server/user';
 import { signIn } from '@/lib/auth-client';
-import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+
+import { PasswordInput } from '../password-input';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
   rememberMe: z.boolean(),
 });
+
+const passwordVisibleAtom = atom(false);
 
 export function SignInForm({
   className,
@@ -50,39 +57,74 @@ export function SignInForm({
       rememberMe: false,
     },
   });
-
   const { isSubmitting } = form.formState;
+  const [isPasswordVisible, setIsPasswordVisible] =
+    useAtom(passwordVisibleAtom);
+
+  const setUser = useSetAtom(authUserAtom);
+  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { email, password, rememberMe } = values;
-    await signIn.email(
-      {
-        email,
-        password,
-        rememberMe,
-      },
-      {
-        onSuccess: () => {
-          toast.success('Logged in successfully!');
-          redirect('/');
+    await signIn
+      .email(
+        {
+          email,
+          password,
+          rememberMe,
         },
-        onError: (ctx) => {
-          // Handle the error
-          if (ctx.error.status === 403) {
-            toast.warning('Please verify your email address.', {
-              description: `${ctx.error.message}. Please click the button to resend the verification email.`,
-              action: {
-                label: 'Resend',
-                onClick: () => resendVerificationEmail(email),
-              },
-            });
-          } else {
-            toast.error('Failed to login. Please check your credentials.');
-          }
+        {
+          onSuccess: (ctx) => {
+            console.log('Signin User : ', ctx);
+            setUser(ctx.data.user);
+            toast.success('Logged in successfully!');
+            router.push('/');
+          },
+          onError: (ctx) => {
+            if (ctx.error.code === 'EMAIL_NOT_VERIFIED') {
+              toast.warning('Please verify your email address.', {
+                description: `${ctx.error.message}. Please click the button to resend the verification email.`,
+                action: {
+                  label: 'Resend',
+                  onClick: () => resendVerificationEmail(email),
+                },
+              });
+            } else {
+              toast.error('Failed to login', {
+                description: `${ctx.error.message}`,
+              });
+            }
+          },
         },
-      },
-    );
+      )
+      .catch((error) => {
+        toast.dismiss();
+        toast.error('Unable to SignIn.', {
+          description: `${getErrorMessage(
+            error,
+          )}. Please click the button to retry.`,
+          action: {
+            label: 'Retry',
+            onClick: () => onSubmit(values),
+          },
+        });
+      });
   }
+
+  const googleSignInHandler = () => {
+    toast.promise(googleSignIn(), {
+      loading: 'Redirecting to Google...',
+      success: 'Successfully redirected to Google!',
+      error: 'Failed to redirected to Google.',
+    });
+  };
+  const githubSignInHandler = () => {
+    toast.promise(githubSignIn(), {
+      loading: 'Redirecting to Github...',
+      success: 'Successfully redirected to Github!',
+      error: 'Failed to redirected to Github.',
+    });
+  };
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
@@ -119,9 +161,12 @@ export function SignInForm({
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             placeholder='password'
-                            type='password'
+                            visibility={isPasswordVisible}
+                            onChangeVisibility={() =>
+                              setIsPasswordVisible((prev) => !prev)
+                            }
                             {...field}
                           />
                         </FormControl>
@@ -159,7 +204,7 @@ export function SignInForm({
                     className='w-full flex items-center justify-center'
                     disabled={isSubmitting}>
                     Login
-                    {isSubmitting && <Loader className='animate-spin' />}
+                    {isSubmitting && <Spinner />}
                   </Button>
                 </div>
               </div>
@@ -168,14 +213,14 @@ export function SignInForm({
                   variant='outline'
                   className='flex-1'
                   type='button'
-                  onClick={googleSignIn}>
+                  onClick={googleSignInHandler}>
                   Login with Google
                 </Button>
                 <Button
                   variant='outline'
                   className='flex-1'
                   type='button'
-                  onClick={githubSignIn}>
+                  onClick={githubSignInHandler}>
                   Login with Github
                 </Button>
               </div>

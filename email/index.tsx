@@ -1,7 +1,13 @@
-import VerificationEmail from './verification-email';
+import DeleteAccount from './delete-account';
+import { DeleteAccountParams } from './delete-account';
 import ResetPassword from './reset-password';
-export { VerificationEmail, ResetPassword };
-
-import { VerificationEmailParams } from './verification-email';
 import { ResetPasswordParams } from './reset-password';
-export type { VerificationEmailParams, ResetPasswordParams };
+import VerificationEmail from './verification-email';
+import { VerificationEmailParams } from './verification-email';
+
+export { VerificationEmail, ResetPassword, DeleteAccount };
+export type {
+  VerificationEmailParams,
+  ResetPasswordParams,
+  DeleteAccountParams,
+};
