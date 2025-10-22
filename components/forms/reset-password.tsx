@@ -1,14 +1,19 @@
 'use client';
 
+import { useMemo } from 'react';
+
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { atom, useAtom } from 'jotai';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { PasswordInput } from '@/components/password-input';
+import { PasswordStrengthIndicator } from '@/components/password-strength-indicator';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -25,16 +30,28 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { resetPassword } from '@/lib/auth-client';
 import { cn, getErrorMessage } from '@/lib/utils';
+import { getPasswordStrength } from '@/lib/utils';
+
+const passwordVisibleAtom = atom(false);
+const confirmPasswordVisibleAtom = atom(false);
 
 const formSchema = z
   .object({
-    password: z.string().min(8, 'Password must be at least 8 characters long'),
-    confirmPassword: z
+    password: z
       .string()
-      .min(8, 'Confirm Password must be at least 8 characters long'),
+      .trim()
+      .min(8, 'Password must be at least 8 characters long')
+      .max(16, 'Must be within 16 characters in length')
+      .regex(new RegExp('.*[A-Z].*'), 'must have one uppercase character')
+      .regex(new RegExp('.*[a-z].*'), 'must have one lowercase character')
+      .regex(new RegExp('.*\\d.*'), 'must have one number')
+      .regex(
+        new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'),
+        'One special character',
+      ),
+    confirmPassword: z.string().trim(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -55,8 +72,19 @@ export function ResetPasswordForm({
     },
   });
 
+  const passwordState = form.watch('password');
+  const passwordStrength = useMemo(() => {
+    return getPasswordStrength(passwordState.trim());
+  }, [passwordState]);
+
   const { isSubmitting } = form.formState;
   const router = useRouter();
+
+  const [isPasswordVisible, setIsPasswordVisible] =
+    useAtom(passwordVisibleAtom);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useAtom(
+    confirmPasswordVisibleAtom,
+  );
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { password } = values;
@@ -138,12 +166,16 @@ export function ResetPasswordForm({
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input
+                        <PasswordInput
                           placeholder='password'
-                          type='password'
+                          visibility={isPasswordVisible}
+                          onChangeVisibility={() =>
+                            setIsPasswordVisible((prev) => !prev)
+                          }
                           {...field}
                         />
                       </FormControl>
+                      <PasswordStrengthIndicator {...passwordStrength} />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -155,9 +187,12 @@ export function ResetPasswordForm({
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input
+                        <PasswordInput
                           placeholder='confirm password'
-                          type='password'
+                          visibility={isConfirmPasswordVisible}
+                          onChangeVisibility={() =>
+                            setIsConfirmPasswordVisible((prev) => !prev)
+                          }
                           {...field}
                         />
                       </FormControl>

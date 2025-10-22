@@ -1,14 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo } from 'react';
 
 import Link from 'next/link';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { atom, useAtom } from 'jotai';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { PasswordInput } from '@/components/password-input';
+import { PasswordStrengthIndicator } from '@/components/password-strength-indicator';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -31,15 +34,29 @@ import { VerifyEmail } from '@/components/verify-email';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { signUp } from '@/lib/auth-client';
 import { cn, getErrorMessage } from '@/lib/utils';
+import { getPasswordStrength } from '@/lib/utils';
+
+const verifyEmailAtom = atom(false);
+const passwordVisibleAtom = atom(false);
+const confirmPasswordVisibleAtom = atom(false);
 
 const formSchema = z
   .object({
-    name: z.string().min(4, 'Name must be at least 4 characters long'),
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters long'),
-    confirmPassword: z
+    name: z.string().trim().min(4, 'Name must be at least 4 characters long'),
+    email: z.string().trim().email('Invalid email address'),
+    password: z
       .string()
-      .min(8, 'Confirm Password must be at least 8 characters long'),
+      .trim()
+      .min(8, 'Password must be at least 8 characters long')
+      .max(16, 'Must be within 16 characters in length')
+      .regex(new RegExp('.*[A-Z].*'), 'must have one uppercase character')
+      .regex(new RegExp('.*[a-z].*'), 'must have one lowercase character')
+      .regex(new RegExp('.*\\d.*'), 'must have one number')
+      .regex(
+        new RegExp('.*[`~<>?,./!@#$%^&*()\\-_+="\'|{}\\[\\];:\\\\].*'),
+        'One special character',
+      ),
+    confirmPassword: z.string().trim(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -50,7 +67,6 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const [verifyEmail, setVerifyEmail] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,6 +76,18 @@ export function SignUpForm({
       confirmPassword: '',
     },
   });
+
+  const [verifyEmail, setVerifyEmail] = useAtom(verifyEmailAtom);
+  const [isPasswordVisible, setIsPasswordVisible] =
+    useAtom(passwordVisibleAtom);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useAtom(
+    confirmPasswordVisibleAtom,
+  );
+
+  const passwordState = form.watch('password');
+  const passwordStrength = useMemo(() => {
+    return getPasswordStrength(passwordState.trim());
+  }, [passwordState]);
 
   const { isSubmitting } = form.formState;
 
@@ -156,12 +184,18 @@ export function SignUpForm({
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             placeholder='password'
-                            type='password'
+                            visibility={isPasswordVisible}
+                            onChangeVisibility={() => {
+                              setIsPasswordVisible((prev) => !prev);
+                            }}
+                            minLength={8}
+                            // maxLength={16}
                             {...field}
                           />
                         </FormControl>
+                        <PasswordStrengthIndicator {...passwordStrength} />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -173,9 +207,12 @@ export function SignUpForm({
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             placeholder='confirm password'
-                            type='password'
+                            visibility={isConfirmPasswordVisible}
+                            onChangeVisibility={() => {
+                              setIsConfirmPasswordVisible((prev) => !prev);
+                            }}
                             {...field}
                           />
                         </FormControl>
@@ -193,7 +230,7 @@ export function SignUpForm({
                     </Button>
                   </div>
                 </div>
-                <div className='mt-5 flex items-center justify-center gap-3'>
+                <div className='mt-5 flex items-center justify-center gap-3 flex-wrap'>
                   <Button
                     variant='outline'
                     className='flex-1'
