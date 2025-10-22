@@ -29,7 +29,7 @@ import { forgetPassword } from '@/lib/auth-client';
 import { cn, getErrorMessage } from '@/lib/utils';
 
 const formSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().trim().email('Invalid email address'),
 });
 
 export function ForgotPasswordForm({

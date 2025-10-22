@@ -45,7 +45,14 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </Provider>
-        <Toaster position='top-right' />
+        <Toaster
+          position='top-right'
+          toastOptions={{
+            classNames: {
+              description: '!text-foreground/80',
+            },
+          }}
+        />
       </body>
     </html>
   );

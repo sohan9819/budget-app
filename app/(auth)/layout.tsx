@@ -1,3 +1,4 @@
+import { ThemeSwitcherButton } from '@/components/buttons/theme-switcher-button';
 import { Logo } from '@/components/logo';
 
 export default function AuthLayout({
@@ -9,6 +10,9 @@ export default function AuthLayout({
     <div className='flex flex-col min-h-svh w-full items-center justify-center p-6 md:p-10'>
       <Logo />
       <div className='w-full max-w-sm'>{children}</div>
+      <div className='fixed bottom-4 right-4 bg-background'>
+        <ThemeSwitcherButton />
+      </div>
     </div>
   );
 }

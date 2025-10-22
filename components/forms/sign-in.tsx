@@ -38,8 +38,11 @@ import { cn } from '@/lib/utils';
 import { PasswordInput } from '../password-input';
 
 const formSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters long'),
+  email: z.string().trim().email('Invalid email address'),
+  password: z
+    .string()
+    .trim()
+    .min(8, 'Password must be at least 8 characters long'),
   rememberMe: z.boolean(),
 });
 
@@ -58,6 +61,7 @@ export function SignInForm({
     },
   });
   const { isSubmitting } = form.formState;
+
   const [isPasswordVisible, setIsPasswordVisible] =
     useAtom(passwordVisibleAtom);
 
