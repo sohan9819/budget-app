@@ -1,4 +1,15 @@
-import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  unique,
+  uuid,
+  doublePrecision,
+  date,
+  integer,
+  primaryKey,
+} from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -9,7 +20,7 @@ export const user = pgTable('user', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .$onUpdate(() => new Date())
     .notNull(),
 });
 
@@ -19,7 +30,8 @@ export const session = pgTable('session', {
   token: text('token').notNull().unique(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
-    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .defaultNow()
+    .$onUpdate(() => new Date())
     .notNull(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
@@ -44,7 +56,7 @@ export const account = pgTable('account', {
   password: text('password'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
-    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .$onUpdate(() => new Date())
     .notNull(),
 });
 
@@ -56,13 +68,98 @@ export const verification = pgTable('verification', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .$onUpdate(() => new Date())
     .notNull(),
 });
+
+export const user_settings = pgTable('user_settings', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  currency: text('currency').notNull(),
+});
+
+export const category = pgTable(
+  'category',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    name: text('name').notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    icon: text('icon').notNull(),
+    type: text('type').default('expense'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [unique('unique_category').on(t.name, t.userId, t.type)],
+);
+
+export const transaction = pgTable('transaction', {
+  id: uuid().defaultRandom().primaryKey(),
+  amount: doublePrecision('amount').notNull(),
+  description: text('description'),
+  date: date(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  categoryId: uuid('category_id')
+    .notNull()
+    .references(() => category.id, { onDelete: 'restrict' }),
+  type: text().default('expense'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+const monthHistory = pgTable(
+  'month_history',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    day: integer('day').notNull(),
+    month: integer('month').notNull(),
+    year: integer('year').notNull(),
+    income: doublePrecision('income').notNull(),
+    expense: doublePrecision('expense').notNull(),
+  },
+  (t) => [
+    primaryKey({
+      name: 'unique_month_history',
+      columns: [t.day, t.month, t.year, t.userId],
+    }),
+  ],
+);
+
+const yearHistory = pgTable(
+  'year_history',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    month: integer('month').notNull(),
+    year: integer('year').notNull(),
+    income: doublePrecision('income').notNull(),
+    expense: doublePrecision('expense').notNull(),
+  },
+  (t) => [
+    primaryKey({
+      name: 'unique_year_history',
+      columns: [t.month, t.year, t.userId],
+    }),
+  ],
+);
 
 export const schema = {
   user,
   session,
   account,
   verification,
+  user_settings,
+  category,
+  transaction,
+  monthHistory,
+  yearHistory,
 };
