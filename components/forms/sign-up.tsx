@@ -33,6 +33,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { VerifyEmail } from '@/components/verify-email';
 import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { signUp } from '@/lib/auth-client';
+import { Redirects } from '@/lib/redirects';
 import { cn, getErrorMessage } from '@/lib/utils';
 import { getPasswordStrength } from '@/lib/utils';
 
@@ -99,6 +100,7 @@ export function SignUpForm({
           name,
           email,
           password,
+          callbackURL: Redirects.onboarding,
         },
         {
           onSuccess: () => {

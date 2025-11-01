@@ -6,7 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { atom, useAtom } from 'jotai';
 import { toast } from 'sonner';
 
-import { UpdateUserCurrency } from '@/app/wizard/_actions/userSettings';
+import { UpdateUserCurrency } from '@/app/onboarding/_actions/userSettings';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -111,24 +111,30 @@ export function CurrencyComboBox() {
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button
-          variant='outline'
-          className='w-full justify-start'
-          disabled={updateCurrencyMutation.isPending}>
-          {selectedCurrency ? <>{selectedCurrency.label}</> : <>Set currency</>}
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <div className='mt-4 border-t'>
-          <CurrencyList
-            setOpen={setOpen}
-            setSelectedCurrency={updateSelectedCurrency}
-          />
-        </div>
-      </DrawerContent>
-    </Drawer>
+    <SkeletonWrapper isLoading={isLoading || isFetching}>
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>
+          <Button
+            variant='outline'
+            className='w-full justify-start'
+            disabled={updateCurrencyMutation.isPending}>
+            {selectedCurrency ? (
+              <>{selectedCurrency.label}</>
+            ) : (
+              <>Set currency</>
+            )}
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <div className='mt-4 border-t'>
+            <CurrencyList
+              setOpen={setOpen}
+              setSelectedCurrency={updateSelectedCurrency}
+            />
+          </div>
+        </DrawerContent>
+      </Drawer>
+    </SkeletonWrapper>
   );
 }
 

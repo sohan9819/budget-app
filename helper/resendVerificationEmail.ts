@@ -1,6 +1,7 @@
 import { toast } from 'sonner';
 
 import { sendVerificationEmail } from '@/lib/auth-client';
+import { Redirects } from '@/lib/redirects';
 
 export const resendVerificationEmail = (email: string) => {
   // Logic to resend the verification email
@@ -8,7 +9,7 @@ export const resendVerificationEmail = (email: string) => {
     () =>
       sendVerificationEmail({
         email,
-        callbackURL: '/sign-in',
+        callbackURL: Redirects.onboarding,
       }),
     {
       loading: 'Sending the verification email...',

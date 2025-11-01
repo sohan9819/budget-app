@@ -8,7 +8,7 @@ import { db } from '@/db/drizzle';
 import { user_settings } from '@/db/schema';
 import { auth } from '@/lib/auth';
 
-export async function GET(request: Request) {
+export async function GET() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
