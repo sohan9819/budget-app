@@ -9,7 +9,10 @@ import {
   date,
   integer,
   primaryKey,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
+
+import { CurrencyValues } from '@/lib/currencies';
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -72,11 +75,13 @@ export const verification = pgTable('verification', {
     .notNull(),
 });
 
+export const currencyEnum = pgEnum('currency_enum', CurrencyValues);
+
 export const user_settings = pgTable('user_settings', {
   userId: text('user_id')
     .primaryKey()
     .references(() => user.id, { onDelete: 'cascade' }),
-  currency: text('currency').notNull(),
+  currency: currencyEnum('currency').notNull().default('INR'),
 });
 
 export const category = pgTable(
@@ -157,6 +162,7 @@ export const schema = {
   session,
   account,
   verification,
+  currencyEnum,
   user_settings,
   category,
   transaction,

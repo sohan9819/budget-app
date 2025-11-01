@@ -5,6 +5,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { sendEmail } from '@/actions/sendEmail';
 import { db } from '@/db/drizzle';
 import { schema } from '@/db/schema';
+import { user_settings } from '@/db/schema';
 
 // Better Auth Config Options : https://www.better-auth.com/docs/reference/options
 export const auth = betterAuth({
@@ -30,6 +31,18 @@ export const auth = betterAuth({
     enabled: true,
     window: 10,
     max: 50,
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        async after(account) {
+          await db
+            .insert(user_settings)
+            .values({ userId: account.id, currency: 'INR' })
+            .returning();
+        },
+      },
+    },
   },
   user: {
     deleteUser: {
