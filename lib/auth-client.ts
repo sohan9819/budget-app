@@ -21,13 +21,13 @@ export const {
 export const googleSignIn = async () => {
   return await signIn.social({
     provider: 'google',
-    newUserCallbackURL: Redirects.dashboard,
+    newUserCallbackURL: Redirects.onboarding,
   });
 };
 
 export const githubSignIn = async () => {
   return await signIn.social({
     provider: 'github',
-    newUserCallbackURL: Redirects.dashboard,
+    newUserCallbackURL: Redirects.onboarding,
   });
 };
