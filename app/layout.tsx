@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { Provider } from 'jotai';
 
+import { QueryProvider } from '@/components/providers/query-provider';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -37,13 +38,15 @@ export default function RootLayout({
       </head>
       <body className={`${roboto.variable} ${robotoMono.variable} antialiased`}>
         <Provider>
-          <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
-            enableSystem
-            disableTransitionOnChange>
-            {children}
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider
+              attribute='class'
+              defaultTheme='system'
+              enableSystem
+              disableTransitionOnChange>
+              {children}
+            </ThemeProvider>
+          </QueryProvider>
         </Provider>
         <Toaster
           position='top-right'
