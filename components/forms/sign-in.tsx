@@ -29,8 +29,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { resendVerificationEmail } from '@/helper';
-import { googleSignIn, githubSignIn } from '@/lib/auth-client';
-import { signIn } from '@/lib/auth-client';
+import { signIn, googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { getErrorMessage } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useSessionUtils } from '@/queries/auth.utils';

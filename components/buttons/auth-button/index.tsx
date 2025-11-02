@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { User } from 'lucide-react';
 import { LogOut, Trash } from 'lucide-react';
 import { toast } from 'sonner';
@@ -34,7 +34,7 @@ import { useSessionUtils } from '@/queries/auth.utils';
 import { deleteAlertOpen, logoutAlertOpen } from './atoms';
 
 export function AuthButton() {
-  const [user] = useAtom(authUserAtom);
+  const user = useAtomValue(authUserAtom);
   const { invalidateSession } = useSessionUtils();
 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useAtom(deleteAlertOpen);
