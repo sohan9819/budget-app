@@ -6,8 +6,11 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { auth } from '@/lib/auth';
+import { getQueryClient } from '@/lib/get-query-client';
 import { prefetchAuthSession } from '@/queries/auth.prefetch';
 import type { SessionResponse } from '@/queries/auth.queries';
+import { prefetchUserSettings } from '@/queries/user-settings.prefetch';
+import { getUserSettings } from '@/server/user-settings';
 
 export default async function AppLayout({
   children,
@@ -29,8 +32,13 @@ export default async function AppLayout({
     user: sessionData.user,
   };
 
-  // Prefetch session data into React Query cache
-  const queryClient = prefetchAuthSession(sessionResponse);
+  const userSettings = await getUserSettings();
+  const queryClient = getQueryClient();
+
+  // Prefetch both session and user settings into React Query cache
+  prefetchAuthSession(queryClient, sessionResponse);
+  prefetchUserSettings(queryClient, userSettings);
+
   const dehydratedState = dehydrate(queryClient);
 
   return (

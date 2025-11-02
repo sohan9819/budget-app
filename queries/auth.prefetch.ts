@@ -1,6 +1,7 @@
 import { getQueryClient } from '@/lib/get-query-client';
 
 import type { SessionResponse } from './auth.queries';
+import type { QueryClient } from '@tanstack/react-query';
 
 /**
  * Server-side function to prefetch session data into React Query cache
@@ -9,9 +10,10 @@ import type { SessionResponse } from './auth.queries';
  * @param sessionResponse - The session data to prefetch (already fetched on server)
  * @returns QueryClient with prefetched session data
  */
-export function prefetchAuthSession(sessionResponse: SessionResponse) {
-  const queryClient = getQueryClient();
-
+export function prefetchAuthSession(
+  queryClient: QueryClient,
+  sessionResponse: SessionResponse,
+) {
   // Prefetch the session query with the provided data
   queryClient.setQueryData(['session'], sessionResponse);
 

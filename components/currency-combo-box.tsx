@@ -2,11 +2,15 @@
 
 import { useCallback, useEffect } from 'react';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { atom, useAtom } from 'jotai';
+import { useMutation } from '@tanstack/react-query';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 
 import { UpdateUserCurrency } from '@/app/onboarding/_actions/userSettings';
+import {
+  userCurrencyAtom,
+  userSettingsLoadingAtom,
+} from '@/atoms/userSettingsAtom';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -24,7 +28,7 @@ import {
 } from '@/components/ui/popover';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { Currencies, Currency, CurrencyMap } from '@/lib/currencies';
-import { UserSettings } from '@/schema';
+import { useUserSettingsUtils } from '@/queries/user-settings.utils';
 
 import { SkeletonWrapper } from './skeleton-wrapper';
 
@@ -36,19 +40,30 @@ export function CurrencyComboBox() {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
 
-  const { data, isLoading, isFetching, isError } = useQuery<UserSettings[]>({
-    queryKey: ['userSettings'],
-    queryFn: () => fetch('/api/user-settings').then((res) => res.json()),
-  });
+  // Use Jotai atoms instead of useQuery
+  const currency = useAtomValue(userCurrencyAtom);
+  const isLoading = useAtomValue(userSettingsLoadingAtom);
+  const { invalidateUserSettings } = useUserSettingsUtils();
+
+  // Initialize selected currency from atom
+  useEffect(() => {
+    if (currency) {
+      const currencyObj = CurrencyMap[currency as Currency['value']];
+      if (currencyObj) {
+        setSelectedCurrency(currencyObj);
+      }
+    }
+  }, [currency, setSelectedCurrency]);
 
   const updateCurrencyMutation = useMutation({
     mutationFn: UpdateUserCurrency,
-    mutationKey: ['userSettings'],
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       const { updatedUserSettings } = data[0];
       const updatedCurrency =
         CurrencyMap[updatedUserSettings.currency as Currency['value']];
       setSelectedCurrency(updatedCurrency);
+      // Invalidate to refetch and update atoms
+      await invalidateUserSettings();
     },
   });
 
@@ -76,16 +91,9 @@ export function CurrencyComboBox() {
     [updateCurrencyMutation],
   );
 
-  useEffect(() => {
-    if (data && !(isLoading || isFetching) && !isError) {
-      console.log('Setting Currency');
-      setSelectedCurrency(CurrencyMap[data[0].currency as Currency['value']]);
-    }
-  }, [data, isError, isFetching, isLoading, setSelectedCurrency]);
-
   if (isDesktop) {
     return (
-      <SkeletonWrapper isLoading={isLoading || isFetching}>
+      <SkeletonWrapper isLoading={isLoading}>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -111,7 +119,7 @@ export function CurrencyComboBox() {
   }
 
   return (
-    <SkeletonWrapper isLoading={isLoading || isFetching}>
+    <SkeletonWrapper isLoading={isLoading}>
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
           <Button
