@@ -1,5 +1,3 @@
-import { getQueryClient } from '@/lib/get-query-client';
-
 import type { SessionResponse } from './auth.queries';
 import type { QueryClient } from '@tanstack/react-query';
 

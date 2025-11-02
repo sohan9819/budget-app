@@ -32,7 +32,10 @@ export default async function AppLayout({
     user: sessionData.user,
   };
 
+  // Fetch user-settings once on the server
   const userSettings = await getUserSettings();
+
+  // Create QueryClient instance for server
   const queryClient = getQueryClient();
 
   // Prefetch both session and user settings into React Query cache

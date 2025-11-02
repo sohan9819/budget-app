@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 
 import {
   authSessionAtom,
+  authUserAtom,
   sessionErrorAtom,
   sessionLoadingAtom,
   sessionStatusAtom,
@@ -29,7 +30,7 @@ interface AuthProviderProps {
  * - Uses React Query for automatic refetching and caching
  * - Handles authentication state changes throughout the app
  */
-export function AuthProvider({ children, session, user }: AuthProviderProps) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
 
   // Read atoms to trigger React Query subscription
@@ -37,18 +38,19 @@ export function AuthProvider({ children, session, user }: AuthProviderProps) {
   const isAuthenticated = useAtomValue(sessionStatusAtom);
   const isLoading = useAtomValue(sessionLoadingAtom);
   const error = useAtomValue(sessionErrorAtom);
-  const clientSession = useAtomValue(authSessionAtom);
+  const authSession = useAtomValue(authSessionAtom);
+  const authUser = useAtomValue(authUserAtom);
 
   // Handle logout / invalid session
   useEffect(() => {
-    if (!isLoading && !session && !clientSession && !isAuthenticated) {
+    if (!isLoading && !authSession && !authUser && !isAuthenticated) {
       console.log('Session cleared - redirecting to sign in');
       toast.error('You have been logged out.', {
         description: 'Please sign in to continue.',
       });
       router.push('/sign-in');
     }
-  }, [isLoading, session, clientSession, isAuthenticated, router]);
+  }, [isLoading, authSession, authUser, isAuthenticated, router]);
 
   // Handle session errors gracefully
   useEffect(() => {
@@ -61,5 +63,5 @@ export function AuthProvider({ children, session, user }: AuthProviderProps) {
     }
   }, [error]);
 
-  return <>{children}</>;
+  return children;
 }
