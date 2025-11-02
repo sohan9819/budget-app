@@ -1,80 +1,65 @@
-// src/providers/SessionProvider.tsx
 'use client';
 
 import React, { useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { useSetAtom } from 'jotai';
-import { useHydrateAtoms } from 'jotai/utils';
+import { useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 
-import { authSessionAtom, authUserAtom } from '@/atoms/authAtom';
-import { useSession } from '@/lib/auth-client';
+import {
+  authSessionAtom,
+  sessionErrorAtom,
+  sessionLoadingAtom,
+  sessionStatusAtom,
+} from '@/atoms/authAtom';
 
 import type { Session, User } from 'better-auth';
 
-interface SessionProviderProps {
+interface AuthProviderProps {
   children: React.ReactNode;
-  session: Session;
-  user: User;
+  session: Session | null;
+  user: User | null;
 }
 
-export function AuthProvider({
-  children,
-  session,
-  user,
-}: SessionProviderProps) {
-  useHydrateAtoms([
-    [authSessionAtom, session],
-    [authUserAtom, user],
-  ]);
-
-  const { data: clientSession, isPending, error } = useSession();
-  const setSession = useSetAtom(authSessionAtom);
-  const setUser = useSetAtom(authUserAtom);
-
+/**
+ * AuthProvider that integrates Jotai atoms with React Query
+ * This provider:
+ * - Session is already prefetched via HydrationBoundary in the layout
+ * - Uses React Query for automatic refetching and caching
+ * - Handles authentication state changes throughout the app
+ */
+export function AuthProvider({ children, session, user }: AuthProviderProps) {
   const router = useRouter();
 
-  // ✅ Initialize from server data
-  useEffect(() => {
-    if (session && user) {
-      setSession(session);
-      setUser(user);
-    }
-  }, [session, user, setSession, setUser]);
+  // Read atoms to trigger React Query subscription
+  // Session data is already prefetched, so isLoading should be false on mount
+  const isAuthenticated = useAtomValue(sessionStatusAtom);
+  const isLoading = useAtomValue(sessionLoadingAtom);
+  const error = useAtomValue(sessionErrorAtom);
+  const clientSession = useAtomValue(authSessionAtom);
 
-  // ✅ Sync client session updates
-  // This could be only needed when update user profile features are added
-  // useEffect(() => {
-  //   if (clientSession?.session && clientSession?.user) {
-  //     setSession(clientSession.session);
-  //     setUser(clientSession.user);
-  //   }
-  // }, [clientSession, setSession, setUser]);
-
-  // ✅ Handle logout / invalid session
+  // Handle logout / invalid session
   useEffect(() => {
-    if (!isPending && !session && !clientSession?.session) {
-      setSession(null);
-      setUser(null);
-      console.log('Cleared Auth State');
+    if (!isLoading && !session && !clientSession && !isAuthenticated) {
+      console.log('Session cleared - redirecting to sign in');
       toast.error('You have been logged out.', {
         description: 'Please sign in to continue.',
       });
-      router.push('/signin');
+      router.push('/sign-in');
     }
-  }, [isPending, session, clientSession, setSession, setUser, router]);
+  }, [isLoading, session, clientSession, isAuthenticated, router]);
 
-  // ✅ Handle session errors gracefully
+  // Handle session errors gracefully
   useEffect(() => {
     if (error) {
-      // console.error('Better Auth session error:', error);
-      toast.error('Better Auth session error:', {
-        description: error.message,
+      console.error('Session error:', error);
+      toast.error('Session error', {
+        description:
+          error.message || 'An error occurred while fetching your session.',
       });
     }
   }, [error]);
 
-  return children;
+  return <>{children}</>;
 }

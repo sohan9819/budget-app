@@ -1,12 +1,12 @@
 'use client';
 import { useRouter } from 'next/navigation';
 
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { User } from 'lucide-react';
 import { LogOut, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { authUserAtom, authSessionAtom } from '@/atoms/authAtom';
+import { authUserAtom } from '@/atoms/authAtom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,12 +29,13 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { signOut, deleteUser } from '@/lib/auth-client';
 import { getErrorMessage } from '@/lib/utils';
+import { useSessionUtils } from '@/queries/auth.utils';
 
 import { deleteAlertOpen, logoutAlertOpen } from './atoms';
 
 export function AuthButton() {
-  const [user, setAuthUser] = useAtom(authUserAtom);
-  const setAuthSession = useSetAtom(authSessionAtom);
+  const [user] = useAtom(authUserAtom);
+  const { invalidateSession } = useSessionUtils();
 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useAtom(deleteAlertOpen);
   const [isLogoutAlertOpen, setIsLogoutAlertOpen] = useAtom(logoutAlertOpen);
@@ -44,20 +45,18 @@ export function AuthButton() {
   const signOutHandler = () => {
     signOut({
       fetchOptions: {
-        onSuccess: () => {
+        onSuccess: async () => {
           toast.success('Logout successful.');
-          setAuthUser(null);
-          setAuthSession(null);
+          await invalidateSession();
           router.replace('/sign-in');
         },
-        onError: (ctx) => {
+        onError: async (ctx) => {
           if (ctx.error.code === 'FAILED_TO_GET_SESSION') {
             toast.warning('Unable to log out.', {
               description:
                 'No active session found. You are already logged out.',
             });
-            setAuthUser(null);
-            setAuthSession(null);
+            await invalidateSession();
             router.replace('/sign-in');
           } else {
             toast.error('Unable to log out.', {
@@ -87,23 +86,21 @@ export function AuthButton() {
     deleteUser({
       callbackURL: '/',
       fetchOptions: {
-        onSuccess: () => {
+        onSuccess: async () => {
           toast.success('Account Deletion Request', {
             description:
               'Please verify the request by clicking the link in the email to complete the deletion.',
           });
-          setAuthUser(null);
-          setAuthSession(null);
+          await invalidateSession();
           router.push('/sign-in');
         },
-        onError: (ctx) => {
+        onError: async (ctx) => {
           if (ctx.error.code === 'FAILED_TO_GET_SESSION') {
             toast.warning('Unable to delete account.', {
               description:
                 'No active session found. You are already logged out.',
             });
-            setAuthUser(null);
-            setAuthSession(null);
+            await invalidateSession();
             router.push('/sign-in');
           } else {
             toast.error('Unable to delete account.', {

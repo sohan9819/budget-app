@@ -4,12 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useAtom, atom, useSetAtom } from 'jotai';
+import { useAtom, atom } from 'jotai';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { authUserAtom } from '@/atoms/authAtom';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -34,6 +33,7 @@ import { googleSignIn, githubSignIn } from '@/lib/auth-client';
 import { signIn } from '@/lib/auth-client';
 import { getErrorMessage } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { useSessionUtils } from '@/queries/auth.utils';
 
 import { PasswordInput } from '../password-input';
 
@@ -65,8 +65,8 @@ export function SignInForm({
   const [isPasswordVisible, setIsPasswordVisible] =
     useAtom(passwordVisibleAtom);
 
-  const setUser = useSetAtom(authUserAtom);
   const router = useRouter();
+  const { invalidateSession } = useSessionUtils();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { email, password, rememberMe } = values;
@@ -78,9 +78,9 @@ export function SignInForm({
           rememberMe,
         },
         {
-          onSuccess: (ctx) => {
+          onSuccess: async (ctx) => {
             console.log('Signin User : ', ctx);
-            setUser(ctx.data.user);
+            await invalidateSession();
             toast.success('Logged in successfully!');
             router.push('/');
           },
@@ -122,6 +122,7 @@ export function SignInForm({
       error: 'Failed to redirected to Google.',
     });
   };
+
   const githubSignInHandler = () => {
     toast.promise(githubSignIn(), {
       loading: 'Redirecting to Github...',
