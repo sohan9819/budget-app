@@ -6,7 +6,7 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { auth } from '@/lib/auth';
-import { prefetchSession } from '@/lib/prefetch-session';
+import { prefetchAuthSession } from '@/queries/auth.prefetch';
 import type { SessionResponse } from '@/queries/auth.queries';
 
 export default async function AppLayout({
@@ -30,7 +30,7 @@ export default async function AppLayout({
   };
 
   // Prefetch session data into React Query cache
-  const queryClient = prefetchSession(sessionResponse);
+  const queryClient = prefetchAuthSession(sessionResponse);
   const dehydratedState = dehydrate(queryClient);
 
   return (
