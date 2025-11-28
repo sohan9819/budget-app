@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { apiClient } from '@/helper/apiClient';
+import { apiClient } from '@/lib/api-client';
 import type { UserSettings } from '@/schema/user_settings';
 
 /**

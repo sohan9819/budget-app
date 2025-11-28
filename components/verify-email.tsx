@@ -11,14 +11,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { resendVerificationEmail } from '@/helper';
+import { resendVerificationEmail } from '@/lib/email';
 
 interface VerifyEmailProps {
   email: string;
   name: string;
 }
 
-export function VerifyEmail({ email, name }: VerifyEmailProps) {
+export const VerifyEmail = ({ email, name }: VerifyEmailProps) => {
   return (
     <Card>
       <CardHeader>
@@ -42,4 +42,4 @@ export function VerifyEmail({ email, name }: VerifyEmailProps) {
       </CardContent>
     </Card>
   );
-}
+};

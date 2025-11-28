@@ -6,8 +6,11 @@ import {
 import { z } from 'zod';
 
 import { user_settings } from '@/db/schema';
+import { CurrencyValues } from '@/lib/currencies';
 
-export const UserSettings = createSelectSchema(user_settings);
+export const UserSettings = createSelectSchema(user_settings).extend({
+  currency: z.enum(CurrencyValues),
+});
 export type UserSettings = z.infer<typeof UserSettings>;
 
 export const InsertUserSettings = createInsertSchema(user_settings);

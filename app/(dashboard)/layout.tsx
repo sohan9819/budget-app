@@ -3,8 +3,8 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { getQueryClient } from '@/lib/get-query-client';
-import { prefetchAuthSession } from '@/queries/auth.prefetch';
-import { prefetchUserSettings } from '@/queries/user-settings.prefetch';
+import { prefetchAuthSession } from '@/queries/auth/auth.prefetch';
+import { prefetchUserSettings } from '@/queries/user-settings/user-settings.prefetch';
 import { getAuthSession } from '@/server/auth';
 import { getUserSettings } from '@/server/user-settings';
 
@@ -30,10 +30,10 @@ export default async function AppLayout({
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <AuthProvider session={authSession.session} user={authSession.user}>
+      <AuthProvider>
         <div className='relative flex h-screen w-full flex-col'>
           <Navbar />
-          <div className='w-full max-w-sm'>{children}</div>
+          <div className='w-full'>{children}</div>
         </div>
       </AuthProvider>
     </HydrationBoundary>

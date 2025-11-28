@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 
-import { useAtom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { User } from 'lucide-react';
 import { LogOut, Trash } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,9 +29,10 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { signOut, deleteUser } from '@/lib/auth-client';
 import { getErrorMessage } from '@/lib/utils';
-import { useSessionUtils } from '@/queries/auth.utils';
+import { useSessionUtils } from '@/queries/auth/auth.utils';
 
-import { deleteAlertOpen, logoutAlertOpen } from './atoms';
+const deleteAlertOpen = atom(false);
+const logoutAlertOpen = atom(false);
 
 export function AuthButton() {
   const user = useAtomValue(authUserAtom);

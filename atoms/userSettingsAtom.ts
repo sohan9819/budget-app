@@ -3,7 +3,8 @@
 import { atom } from 'jotai';
 import { atomWithQuery } from 'jotai-tanstack-query';
 
-import { fetchUserSettings } from '@/queries/user-settings.queries';
+import { Currency, CURRENCY_CODES } from '@/lib/currencies';
+import { fetchUserSettings } from '@/queries/user-settings/user-settings.queries';
 import type { UserSettings } from '@/schema/user_settings';
 
 /**
@@ -38,9 +39,9 @@ export const userSettingsAtom = atom<UserSettings | null>((get) => {
 /**
  * Get user currency setting
  */
-export const userCurrencyAtom = atom<string | null>((get) => {
+export const userCurrencyAtom = atom<Currency['value'] | null>((get) => {
   const settings = get(userSettingsAtom);
-  return settings?.currency ?? null;
+  return settings?.currency ?? CURRENCY_CODES[0];
 });
 
 /**

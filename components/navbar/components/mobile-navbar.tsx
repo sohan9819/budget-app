@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { Menu } from 'lucide-react';
 
 import { AuthButton } from '@/components/buttons/auth-button';
@@ -17,9 +17,10 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 
-import { isNavbarOpenAtom } from '../atoms';
 import { navlinks } from '../constants';
 import { NavbarItem } from './navbar-item';
+
+const isNavbarOpenAtom = atom(false);
 
 export const MobileNavbar = () => {
   const [isOpen, setIsOpen] = useAtom(isNavbarOpenAtom);

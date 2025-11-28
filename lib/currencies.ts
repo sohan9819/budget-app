@@ -1,3 +1,35 @@
+import {
+  DollarSign,
+  Euro,
+  PoundSterling,
+  IndianRupee,
+  JapaneseYen,
+  SwissFranc,
+  Coins, // fallback
+  CircleDollarSign,
+  CircleEllipsis,
+  LucideIcon,
+} from 'lucide-react';
+
+// Required for pgEnum
+export const CURRENCY_CODES = [
+  'USD',
+  'EUR',
+  'GBP',
+  'INR',
+  'JPY',
+  'CNY',
+  'AUD',
+  'CAD',
+  'CHF',
+  'SGD',
+  'NZD',
+  'AED',
+  'ZAR',
+  'SEK',
+  'BRL',
+] as const;
+
 export const Currencies = [
   {
     value: 'USD',
@@ -76,12 +108,49 @@ export const Currencies = [
   },
 ] as const;
 
-export const CurrencyValues = Currencies.map((currency) => currency.value) as [
-  string,
-  ...string[],
-];
+export const CurrencyStrings: Record<Currency['value'], string> = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  INR: '₹',
+  JPY: '¥',
+  CNY: '¥',
+  AUD: 'A$',
+  CAD: 'C$',
+  CHF: 'CHF',
+  SGD: 'S$',
+  NZD: 'NZ$',
+  AED: 'د.إ',
+  ZAR: 'R',
+  SEK: 'kr',
+  BRL: 'R$',
+};
+
+export const CurrencyIcons: Record<Currency['value'], LucideIcon> = {
+  USD: DollarSign,
+  EUR: Euro,
+  GBP: PoundSterling,
+  INR: IndianRupee,
+  JPY: JapaneseYen,
+  CNY: CircleDollarSign,
+  AUD: CircleDollarSign,
+  CAD: CircleDollarSign,
+  CHF: SwissFranc,
+  SGD: Coins,
+  NZD: Coins,
+  AED: CircleEllipsis,
+  ZAR: Coins,
+  SEK: Coins,
+  BRL: Coins,
+};
 
 export type Currency = (typeof Currencies)[number];
+export type CurrencyCode = Currency['value'];
 export const CurrencyMap = Object.fromEntries(
   Currencies.map((c) => [c.value, c]),
 ) as Record<Currency['value'], Currency>;
+
+export const CurrencyValues = Currencies.map((c) => c.value) as [
+  CurrencyCode,
+  ...CurrencyCode[],
+];

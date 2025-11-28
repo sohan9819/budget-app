@@ -28,11 +28,11 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { resendVerificationEmail } from '@/helper';
 import { signIn, googleSignIn, githubSignIn } from '@/lib/auth-client';
+import { resendVerificationEmail } from '@/lib/email';
 import { getErrorMessage } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { useSessionUtils } from '@/queries/auth.utils';
+import { useSessionUtils } from '@/queries/auth/auth.utils';
 
 import { PasswordInput } from '../password-input';
 
@@ -77,8 +77,7 @@ export function SignInForm({
           rememberMe,
         },
         {
-          onSuccess: async (ctx) => {
-            console.log('Signin User : ', ctx);
+          onSuccess: async () => {
             await invalidateSession();
             toast.success('Logged in successfully!');
             router.push('/');

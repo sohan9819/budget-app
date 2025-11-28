@@ -1,25 +1,34 @@
 'use client';
 
+import { redirect } from 'next/navigation';
+
 import { useQuery } from '@tanstack/react-query';
 
-import { apiClient } from '@/helper/apiClient';
+// import { apiClient } from '@/lib/api-client';
+import { getSession } from '@/lib/auth-client';
 
 import type { Session, User } from 'better-auth';
 
 export interface SessionResponse {
-  session: Session | null;
-  user: User | null;
+  session: Session;
+  user: User;
 }
 
 /**
  * Client-side function to fetch session from API
  */
 export const fetchSession = async (): Promise<SessionResponse> => {
-  const response = await apiClient<SessionResponse>('/api/auth/session', {
-    method: 'GET',
-    credentials: 'include',
-  });
-  return response;
+  // const data = await apiClient<SessionResponse>('/api/auth/session', {
+  //   method: 'GET',
+  //   credentials: 'include',
+  // });
+  const { data } = await getSession();
+
+  if (!data?.session || !data?.user) {
+    redirect('/sign-in');
+  }
+
+  return data;
 };
 
 /**

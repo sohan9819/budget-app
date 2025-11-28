@@ -3,8 +3,7 @@
 import { atom } from 'jotai';
 import { atomWithQuery } from 'jotai-tanstack-query';
 
-import { fetchSession } from '@/queries/auth.queries';
-import type { SessionResponse } from '@/queries/auth.queries';
+import { fetchSession, SessionResponse } from '@/queries/auth/auth.queries';
 
 import type { Session, User } from 'better-auth';
 

@@ -12,7 +12,18 @@ import {
   pgEnum,
 } from 'drizzle-orm/pg-core';
 
-import { CurrencyValues } from '@/lib/currencies';
+import { CURRENCY_CODES } from '@/lib/currencies';
+import { TRANSACTION_TYPES } from '@/types';
+
+// --------- Pg Enums ---------
+
+export const currencyEnum = pgEnum('currency_enum', CURRENCY_CODES);
+export const transactionTypeEnum = pgEnum(
+  'transaction_type_enum',
+  TRANSACTION_TYPES,
+);
+
+// --------- Pg Tables ---------
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -75,8 +86,6 @@ export const verification = pgTable('verification', {
     .notNull(),
 });
 
-export const currencyEnum = pgEnum('currency_enum', CurrencyValues);
-
 export const user_settings = pgTable('user_settings', {
   userId: text('user_id')
     .primaryKey()
@@ -93,7 +102,7 @@ export const category = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     icon: text('icon').notNull(),
-    type: text('type').default('expense'),
+    type: transactionTypeEnum('type').notNull().default('expense'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [unique('unique_category').on(t.name, t.userId, t.type)],
@@ -103,14 +112,14 @@ export const transaction = pgTable('transaction', {
   id: uuid().defaultRandom().primaryKey(),
   amount: doublePrecision('amount').notNull(),
   description: text('description'),
-  date: date(),
+  date: date().notNull(),
   userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   categoryId: uuid('category_id')
     .notNull()
     .references(() => category.id, { onDelete: 'restrict' }),
-  type: text().default('expense'),
+  type: transactionTypeEnum('type').notNull().default('expense'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()

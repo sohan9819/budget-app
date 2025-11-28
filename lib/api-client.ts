@@ -3,6 +3,7 @@ export const apiClient = async <T>(
   options?: RequestInit,
 ): Promise<T> => {
   const res = await fetch(url, {
+    next: { revalidate: 3600 },
     headers: {
       'Content-Type': 'application/json',
       ...options?.headers,

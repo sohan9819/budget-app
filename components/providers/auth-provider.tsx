@@ -15,12 +15,8 @@ import {
   sessionStatusAtom,
 } from '@/atoms/authAtom';
 
-import type { Session, User } from 'better-auth';
-
 interface AuthProviderProps {
   children: React.ReactNode;
-  session: Session | null;
-  user: User | null;
 }
 
 /**

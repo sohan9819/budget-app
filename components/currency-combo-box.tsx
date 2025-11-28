@@ -6,11 +6,12 @@ import { useMutation } from '@tanstack/react-query';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 
-import { UpdateUserCurrency } from '@/app/onboarding/_actions/userSettings';
+import { UpdateUserCurrency } from '@/app/onboarding/_actions/user-settings';
 import {
   userCurrencyAtom,
   userSettingsLoadingAtom,
 } from '@/atoms/userSettingsAtom';
+import { SkeletonWrapper } from '@/components/skeleton-wrapper';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -28,14 +29,12 @@ import {
 } from '@/components/ui/popover';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { Currencies, Currency, CurrencyMap } from '@/lib/currencies';
-import { useUserSettingsUtils } from '@/queries/user-settings.utils';
-
-import { SkeletonWrapper } from './skeleton-wrapper';
+import { useUserSettingsUtils } from '@/queries/user-settings/user-settings.utils';
 
 const openAtom = atom(false);
 const selectedCurrencyAtom = atom<Currency | null>(null);
 
-export function CurrencyComboBox() {
+export const CurrencyComboBox = () => {
   const [open, setOpen] = useAtom(openAtom);
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
@@ -144,15 +143,15 @@ export function CurrencyComboBox() {
       </Drawer>
     </SkeletonWrapper>
   );
-}
+};
 
-function CurrencyList({
+const CurrencyList = ({
   setOpen,
   setSelectedCurrency,
 }: {
   setOpen: (open: boolean) => void;
   setSelectedCurrency: (status: Currency | null) => void;
-}) {
+}) => {
   return (
     <Command>
       <CommandInput placeholder='Filter status...' />
@@ -175,4 +174,4 @@ function CurrencyList({
       </CommandList>
     </Command>
   );
-}
+};

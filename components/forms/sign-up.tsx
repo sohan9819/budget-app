@@ -32,9 +32,9 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { VerifyEmail } from '@/components/verify-email';
 import { signUp, googleSignIn, githubSignIn } from '@/lib/auth-client';
+import { getPasswordStrength } from '@/lib/password';
 import { Redirects } from '@/lib/redirects';
 import { cn, getErrorMessage } from '@/lib/utils';
-import { getPasswordStrength } from '@/lib/utils';
 
 const verifyEmailAtom = atom(false);
 const passwordVisibleAtom = atom(false);

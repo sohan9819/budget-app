@@ -31,8 +31,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { resetPassword } from '@/lib/auth-client';
+import { getPasswordStrength } from '@/lib/password';
 import { cn, getErrorMessage } from '@/lib/utils';
-import { getPasswordStrength } from '@/lib/utils';
 
 const passwordVisibleAtom = atom(false);
 const confirmPasswordVisibleAtom = atom(false);

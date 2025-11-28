@@ -17,19 +17,18 @@ import { useQueryClient } from '@tanstack/react-query';
  * ```
  */
 export function useSessionUtils() {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    const invalidateSession = async () => {
-        await queryClient.invalidateQueries({ queryKey: ['session'] });
-    };
+  const invalidateSession = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['session'] });
+  };
 
-    const refetchSession = async () => {
-        await queryClient.refetchQueries({ queryKey: ['session'] });
-    };
+  const refetchSession = async () => {
+    await queryClient.refetchQueries({ queryKey: ['session'] });
+  };
 
-    return {
-        invalidateSession,
-        refetchSession,
-    };
+  return {
+    invalidateSession,
+    refetchSession,
+  };
 }
-
