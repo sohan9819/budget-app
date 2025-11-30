@@ -3,7 +3,8 @@
 import { useCallback, useEffect } from 'react';
 
 import { useMutation } from '@tanstack/react-query';
-import { atom, useAtom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { UpdateUserCurrency } from '@/app/onboarding/_actions/user-settings';
@@ -29,6 +30,7 @@ import {
 } from '@/components/ui/popover';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { Currencies, Currency, CurrencyMap } from '@/lib/currencies';
+import { cn } from '@/lib/utils';
 import { useUserSettingsUtils } from '@/queries/user-settings/user-settings.utils';
 
 const openAtom = atom(false);
@@ -93,7 +95,7 @@ export const CurrencyComboBox = () => {
   if (isDesktop) {
     return (
       <SkeletonWrapper isLoading={isLoading}>
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={setOpen} modal={true}>
           <PopoverTrigger asChild>
             <Button
               variant='outline'
@@ -107,10 +109,7 @@ export const CurrencyComboBox = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className='w-[200px] p-0' align='start'>
-            <CurrencyList
-              setOpen={setOpen}
-              setSelectedCurrency={updateSelectedCurrency}
-            />
+            <CurrencyList />
           </PopoverContent>
         </Popover>
       </SkeletonWrapper>
@@ -134,10 +133,7 @@ export const CurrencyComboBox = () => {
         </DrawerTrigger>
         <DrawerContent>
           <div className='mt-4 border-t'>
-            <CurrencyList
-              setOpen={setOpen}
-              setSelectedCurrency={updateSelectedCurrency}
-            />
+            <CurrencyList />
           </div>
         </DrawerContent>
       </Drawer>
@@ -145,13 +141,9 @@ export const CurrencyComboBox = () => {
   );
 };
 
-const CurrencyList = ({
-  setOpen,
-  setSelectedCurrency,
-}: {
-  setOpen: (open: boolean) => void;
-  setSelectedCurrency: (status: Currency | null) => void;
-}) => {
+const CurrencyList = () => {
+  const setOpen = useSetAtom(openAtom);
+  const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
   return (
     <Command>
       <CommandInput placeholder='Filter status...' />
@@ -168,6 +160,14 @@ const CurrencyList = ({
                 setOpen(false);
               }}>
               {label}
+              <Check
+                className={cn(
+                  'ml-auto',
+                  selectedCurrency?.value === value
+                    ? 'opacity-100'
+                    : 'opacity-0',
+                )}
+              />
             </CommandItem>
           ))}
         </CommandGroup>

@@ -13,6 +13,8 @@ export type Category = z.infer<typeof Category>;
 
 export const CreateCategorySchema = createInsertSchema(category, {
   type: z.enum(TRANSACTION_TYPES),
+  name: z.string().min(1, 'Name is required').max(50, 'Name is too long'),
+  icon: z.string().min(1, 'Icon is required').max(5, 'Icon is too long'),
 }).omit({
   id: true,
   userId: true,

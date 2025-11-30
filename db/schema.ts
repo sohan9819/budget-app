@@ -102,7 +102,7 @@ export const category = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
     icon: text('icon').notNull(),
-    type: transactionTypeEnum('type').notNull().default('expense'),
+    type: transactionTypeEnum('type').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [unique('unique_category').on(t.name, t.userId, t.type)],
@@ -112,14 +112,14 @@ export const transaction = pgTable('transaction', {
   id: uuid().defaultRandom().primaryKey(),
   amount: doublePrecision('amount').notNull(),
   description: text('description'),
-  date: date().notNull(),
+  date: date('date', { mode: 'date' }).notNull(),
   userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   categoryId: uuid('category_id')
     .notNull()
     .references(() => category.id, { onDelete: 'restrict' }),
-  type: transactionTypeEnum('type').notNull().default('expense'),
+  type: transactionTypeEnum('type').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -127,7 +127,7 @@ export const transaction = pgTable('transaction', {
     .notNull(),
 });
 
-const monthHistory = pgTable(
+export const monthHistory = pgTable(
   'month_history',
   {
     userId: text('user_id')
@@ -136,8 +136,8 @@ const monthHistory = pgTable(
     day: integer('day').notNull(),
     month: integer('month').notNull(),
     year: integer('year').notNull(),
-    income: doublePrecision('income').notNull(),
-    expense: doublePrecision('expense').notNull(),
+    income: doublePrecision('income').default(0).notNull(),
+    expense: doublePrecision('expense').default(0).notNull(),
   },
   (t) => [
     primaryKey({
@@ -147,7 +147,7 @@ const monthHistory = pgTable(
   ],
 );
 
-const yearHistory = pgTable(
+export const yearHistory = pgTable(
   'year_history',
   {
     userId: text('user_id')
@@ -155,8 +155,8 @@ const yearHistory = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
     month: integer('month').notNull(),
     year: integer('year').notNull(),
-    income: doublePrecision('income').notNull(),
-    expense: doublePrecision('expense').notNull(),
+    income: doublePrecision('income').default(0).notNull(),
+    expense: doublePrecision('expense').default(0).notNull(),
   },
   (t) => [
     primaryKey({

@@ -1,13 +1,15 @@
 'use client';
 import React, { useCallback } from 'react';
 
-import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react';
+// import data from '@emoji-mart/data';
+// import Picker from '@emoji-mart/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { atom, useAtom } from 'jotai';
 import { CircleOff, PlusSquare } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useTheme } from 'next-themes';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { CreateCategory as CreateCategoryFn } from '@/app/(dashboard)/(home)/_actions/category';
@@ -45,13 +47,18 @@ import { TransactionType } from '@/types';
 
 interface CreateCategoryDialogProps {
   type: TransactionType;
+  handleCreatedCategory: (category: Category) => void;
 }
 
 const openAtom = atom(false);
 
-export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
+export const CreateCategoryDialog = ({
+  type,
+  handleCreatedCategory,
+}: CreateCategoryDialogProps) => {
   const [open, setOpen] = useAtom(openAtom);
   const queryClient = useQueryClient();
+  const { resolvedTheme } = useTheme();
 
   const { mutate, isPending } = useMutation({
     mutationFn: CreateCategoryFn,
@@ -71,6 +78,7 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
 
       queryClient.invalidateQueries({ queryKey: categoryKeys.list({ type }) });
 
+      handleCreatedCategory(newCategory);
       setOpen((prev) => !prev);
     },
     onError: () => {
@@ -83,11 +91,13 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
   const form = useForm<CreateCategory>({
     resolver: zodResolver(CreateCategorySchema),
     defaultValues: {
+      name: '',
+      icon: '',
       type,
     },
   });
 
-  const onSubmit = useCallback(
+  const onSubmit: SubmitHandler<CreateCategory> = useCallback(
     (values: CreateCategory) => {
       toast.loading('Creating category...', {
         id: 'create-category',
@@ -114,7 +124,9 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            onKeyDown={(e) => e.stopPropagation()}>
             <DialogHeader>
               <DialogTitle>
                 Create a New{' '}
@@ -129,70 +141,89 @@ export const CreateCategoryDialog = ({ type }: CreateCategoryDialogProps) => {
               </DialogDescription>
             </DialogHeader>
 
-            <FormField
-              control={form.control}
-              name='name'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={`Name this ${type} category`}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription></FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className='flex flex-col gap-4 my-4'>
+              <FormField
+                control={form.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={`Name this ${type} category`}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      This is how your category will appear in this app
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='icon'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Icon</FormLabel>
-                  <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant='outline' className='w-full h-[100px]'>
-                          {form.watch('icon') ? (
-                            <div className='flex flex-col items-center gap-2'>
-                              <span className='text-5xl' role='img'>
-                                {field.value}
-                              </span>
-                              <p className='text-xs text-muted-foreground'>
-                                Click to change
-                              </p>
-                            </div>
-                          ) : (
-                            <div className='flex flex-col items-center gap-2'>
-                              <CircleOff className='h-[48px] w-[48px]' />
-                              <p className='text-xs text-muted-foreground'>
-                                Click to select
-                              </p>
-                            </div>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className='w-auto p-0'>
-                        <Picker
+              <FormField
+                control={form.control}
+                name='icon'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Icon</FormLabel>
+                    <FormControl>
+                      <Popover modal={true}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant='outline'
+                            className='w-full h-[100px]'>
+                            {form.watch('icon') ? (
+                              <div className='flex flex-col items-center gap-2'>
+                                <span className='text-5xl' role='img'>
+                                  {field.value}
+                                </span>
+                                <p className='text-xs text-muted-foreground'>
+                                  Click to change
+                                </p>
+                              </div>
+                            ) : (
+                              <div className='flex flex-col items-center gap-2'>
+                                <CircleOff className='h-[48px] w-[48px]' />
+                                <p className='text-xs text-muted-foreground'>
+                                  Click to select
+                                </p>
+                              </div>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-auto h-auto p-0'>
+                          {/* <Picker
                           data={data}
+                          theme={resolvedTheme}
                           onEmojiSelect={(emoji: { native: string }) => {
                             field.onChange(emoji.native);
                           }}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormDescription>
-                    This is how your category will appear in this app
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                        /> */}
+                          <EmojiPicker
+                            onEmojiClick={(emoji) =>
+                              field.onChange(emoji.emoji)
+                            }
+                            theme={resolvedTheme as Theme}
+                            style={{
+                              width: '40vw',
+                              minWidth: '20rem',
+                              height: '40vh',
+                              minHeight: '15rem',
+                            }}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                    <FormDescription>
+                      This is how your category will appear in this app
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <DialogFooter>
               <DialogClose asChild>

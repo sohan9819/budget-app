@@ -14,7 +14,7 @@ export const auth = betterAuth({
     process.env.NODE_ENV === 'production'
       ? [process.env.BETTER_AUTH_URL as string]
       : [
-          'http://192.168.1.18:3000',
+          'http://192.168.0.101:3000',
           'http://localhost:3000', // For local development
           // 'myapp://', // For deep linking in mobile apps
         ],

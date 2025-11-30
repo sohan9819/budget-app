@@ -38,3 +38,20 @@ export const buildQueryString = (params?: Record<string, string>): string => {
   const qs = searchParams.toString();
   return qs ? `?${qs}` : '';
 };
+
+/**
+ * Helper to convert date to UTC
+ */
+export function DateToUTCDate(date: Date) {
+  return new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+      date.getMilliseconds(),
+    ),
+  );
+}
