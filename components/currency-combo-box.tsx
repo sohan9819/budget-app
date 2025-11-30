@@ -2,17 +2,12 @@
 
 import { useCallback, useEffect } from 'react';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { UpdateUserCurrency } from '@/app/onboarding/_actions/user-settings';
-import {
-  userCurrencyAtom,
-  userSettingsLoadingAtom,
-} from '@/atoms/userSettingsAtom';
-import { SkeletonWrapper } from '@/components/skeleton-wrapper';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -31,40 +26,31 @@ import {
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { Currencies, Currency, CurrencyMap } from '@/lib/currencies';
 import { cn } from '@/lib/utils';
-import { useUserSettingsUtils } from '@/queries/user-settings/user-settings.utils';
+import { UserSettings } from '@/schema';
+
+import { SkeletonWrapper } from './skeleton-wrapper';
 
 const openAtom = atom(false);
 const selectedCurrencyAtom = atom<Currency | null>(null);
 
-export const CurrencyComboBox = () => {
+export function CurrencyComboBox() {
   const [open, setOpen] = useAtom(openAtom);
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
 
-  // Use Jotai atoms instead of useQuery
-  const currency = useAtomValue(userCurrencyAtom);
-  const isLoading = useAtomValue(userSettingsLoadingAtom);
-  const { invalidateUserSettings } = useUserSettingsUtils();
-
-  // Initialize selected currency from atom
-  useEffect(() => {
-    if (currency) {
-      const currencyObj = CurrencyMap[currency as Currency['value']];
-      if (currencyObj) {
-        setSelectedCurrency(currencyObj);
-      }
-    }
-  }, [currency, setSelectedCurrency]);
+  const { data, isLoading, isFetching, isError } = useQuery<UserSettings[]>({
+    queryKey: ['userSettings'],
+    queryFn: () => fetch('/api/user-settings').then((res) => res.json()),
+  });
 
   const updateCurrencyMutation = useMutation({
     mutationFn: UpdateUserCurrency,
-    onSuccess: async (data) => {
+    mutationKey: ['userSettings'],
+    onSuccess: (data) => {
       const { updatedUserSettings } = data[0];
       const updatedCurrency =
         CurrencyMap[updatedUserSettings.currency as Currency['value']];
       setSelectedCurrency(updatedCurrency);
-      // Invalidate to refetch and update atoms
-      await invalidateUserSettings();
     },
   });
 
@@ -92,10 +78,17 @@ export const CurrencyComboBox = () => {
     [updateCurrencyMutation],
   );
 
+  useEffect(() => {
+    if (data && !(isLoading || isFetching) && !isError) {
+      console.log('Setting Currency');
+      setSelectedCurrency(CurrencyMap[data[0].currency as Currency['value']]);
+    }
+  }, [data, isError, isFetching, isLoading, setSelectedCurrency]);
+
   if (isDesktop) {
     return (
-      <SkeletonWrapper isLoading={isLoading}>
-        <Popover open={open} onOpenChange={setOpen} modal={true}>
+      <SkeletonWrapper isLoading={isLoading || isFetching}>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant='outline'
@@ -109,7 +102,7 @@ export const CurrencyComboBox = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className='w-[200px] p-0' align='start'>
-            <CurrencyList />
+            <CurrencyList setSelectedCurrency={updateSelectedCurrency} />
           </PopoverContent>
         </Popover>
       </SkeletonWrapper>
@@ -117,7 +110,7 @@ export const CurrencyComboBox = () => {
   }
 
   return (
-    <SkeletonWrapper isLoading={isLoading}>
+    <SkeletonWrapper isLoading={isLoading || isFetching}>
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
           <Button
@@ -133,17 +126,21 @@ export const CurrencyComboBox = () => {
         </DrawerTrigger>
         <DrawerContent>
           <div className='mt-4 border-t'>
-            <CurrencyList />
+            <CurrencyList setSelectedCurrency={updateSelectedCurrency} />
           </div>
         </DrawerContent>
       </Drawer>
     </SkeletonWrapper>
   );
-};
+}
 
-const CurrencyList = () => {
+function CurrencyList({
+  setSelectedCurrency,
+}: {
+  setSelectedCurrency: (status: Currency | null) => void;
+}) {
   const setOpen = useSetAtom(openAtom);
-  const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
+  const selectedCurrency = useAtomValue(selectedCurrencyAtom);
   return (
     <Command>
       <CommandInput placeholder='Filter status...' />
@@ -153,7 +150,7 @@ const CurrencyList = () => {
           {Currencies.map(({ value, label }) => (
             <CommandItem
               key={value}
-              value={value}
+              value={`${value} ${label}`}
               onSelect={(value: string) => {
                 const key = value as keyof typeof CurrencyMap;
                 setSelectedCurrency(CurrencyMap[key]);
@@ -174,4 +171,4 @@ const CurrencyList = () => {
       </CommandList>
     </Command>
   );
-};
+}

@@ -2,7 +2,6 @@
 
 import { ReactNode, useCallback, useState } from 'react';
 
-import { DevTool } from '@hookform/devtools';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -244,8 +243,6 @@ export const CreatTransactionDialog = ({
             </DialogFooter>
           </form>
         </Form>
-
-        {/* <DevTool control={form.control} /> */}
       </DialogContent>
     </Dialog>
   );
@@ -266,8 +263,3 @@ const TransactionTypeStylings: Record<
     [StyleKeys.Title]: 'text-destructive',
   },
 };
-
-// const placeholderDescription: Record<TransactionType, string> = {
-//   income: 'Add some description about the income',
-//   expense: 'Add some description about the expense',
-// };
