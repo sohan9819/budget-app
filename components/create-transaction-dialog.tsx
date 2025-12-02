@@ -39,6 +39,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { transactionKeys } from '@/queries/keys/transaction';
 import { CreateTransactionFormSchema, CreateTransactionForm } from '@/schema';
 import { TransactionType } from '@/types';
 
@@ -77,7 +78,9 @@ export const CreatTransactionDialog = ({
 
       form.reset();
 
-      queryClient.invalidateQueries({ queryKey: ['overview'] });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.list({ type }),
+      });
 
       setOpen((prev) => !prev);
     },
