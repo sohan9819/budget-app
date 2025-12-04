@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { forgetPassword } from '@/lib/auth-client';
+import { forgetPassword } from '@/features/auth/lib/auth-client';
 import { cn, getErrorMessage } from '@/lib/utils';
 
 const formSchema = z.object({

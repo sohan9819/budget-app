@@ -16,16 +16,6 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
     getUserSettingsQueryOptions(),
   );
 
-  // Just to verify the data is been prefetched
-  // const queryClient = useQueryClient();
-  // const prefetchedData = queryClient.getQueryData(userSettingsKeys.all);
-
-  // if (prefetchedData) {
-  //   console.log('Query was prefetched and data is available:', prefetchedData);
-  // } else {
-  //   console.log('Query was not prefetched or data is not in cache.');
-  // }
-
   useEffect(() => {
     if (data && !(isLoading || isFetching) && !isError) {
       setSelectedCurrency(CurrencyMap[data.currency as Currency['value']]);

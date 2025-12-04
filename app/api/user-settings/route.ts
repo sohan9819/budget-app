@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '@/db/drizzle';
 import { user_settings } from '@/db/schema';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 
 export async function GET() {
   const session = await auth.api.getSession({
@@ -14,7 +14,7 @@ export async function GET() {
   });
 
   if (!session?.session || !session?.user) {
-    redirect('/signin');
+    redirect('/sign-in');
   }
 
   let userSettings = await db

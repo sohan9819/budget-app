@@ -6,7 +6,6 @@ import { User } from 'lucide-react';
 import { LogOut, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { authUserAtom } from '@/atoms/authAtom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,16 +26,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Spinner } from '@/components/ui/spinner';
-import { signOut, deleteUser } from '@/lib/auth-client';
+import { authUserAtom } from '@/features/auth/atoms';
+import { signOut, deleteUser } from '@/features/auth/lib/auth-client';
 import { getErrorMessage } from '@/lib/utils';
-import { useSessionUtils } from '@/queries/auth/auth.utils';
 
 const deleteAlertOpen = atom(false);
 const logoutAlertOpen = atom(false);
 
 export function AuthButton() {
   const user = useAtomValue(authUserAtom);
-  const { invalidateSession } = useSessionUtils();
 
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useAtom(deleteAlertOpen);
   const [isLogoutAlertOpen, setIsLogoutAlertOpen] = useAtom(logoutAlertOpen);
@@ -48,7 +46,6 @@ export function AuthButton() {
       fetchOptions: {
         onSuccess: async () => {
           toast.success('Logout successful.');
-          await invalidateSession();
           router.replace('/sign-in');
         },
         onError: async (ctx) => {
@@ -57,7 +54,6 @@ export function AuthButton() {
               description:
                 'No active session found. You are already logged out.',
             });
-            await invalidateSession();
             router.replace('/sign-in');
           } else {
             toast.error('Unable to log out.', {
@@ -92,7 +88,6 @@ export function AuthButton() {
             description:
               'Please verify the request by clicking the link in the email to complete the deletion.',
           });
-          await invalidateSession();
           router.push('/sign-in');
         },
         onError: async (ctx) => {
@@ -101,7 +96,6 @@ export function AuthButton() {
               description:
                 'No active session found. You are already logged out.',
             });
-            await invalidateSession();
             router.push('/sign-in');
           } else {
             toast.error('Unable to delete account.', {

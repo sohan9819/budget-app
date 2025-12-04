@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { db } from '@/db/drizzle';
 import { category } from '@/db/schema';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 import { TRANSACTION_TYPES } from '@/types';
 
 export async function GET(request: Request) {

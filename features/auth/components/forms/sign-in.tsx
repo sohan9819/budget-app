@@ -28,13 +28,15 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { signIn, googleSignIn, githubSignIn } from '@/lib/auth-client';
-import { resendVerificationEmail } from '@/lib/email';
+import { PasswordInput } from '@/features/auth/components/password-input';
+import {
+  signIn,
+  googleSignIn,
+  githubSignIn,
+} from '@/features/auth/lib/auth-client';
+import { resendVerificationEmail } from '@/features/auth/lib/email';
 import { getErrorMessage } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { useSessionUtils } from '@/queries/auth/auth.utils';
-
-import { PasswordInput } from '../password-input';
 
 const formSchema = z.object({
   email: z.string().trim().email('Invalid email address'),
@@ -65,7 +67,6 @@ export function SignInForm({
     useAtom(passwordVisibleAtom);
 
   const router = useRouter();
-  const { invalidateSession } = useSessionUtils();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const { email, password, rememberMe } = values;
@@ -78,7 +79,6 @@ export function SignInForm({
         },
         {
           onSuccess: async () => {
-            await invalidateSession();
             toast.success('Logged in successfully!');
             router.push('/');
           },

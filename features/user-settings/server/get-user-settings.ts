@@ -7,8 +7,8 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '@/db/drizzle';
 import { user_settings } from '@/db/schema';
-import { auth } from '@/lib/auth';
-import type { UserSettings } from '@/schema/user_settings';
+import { auth } from '@/features/auth/lib/auth';
+import type { UserSettings } from '@/features/user-settings/schema';
 
 /**
  * Server-side function to fetch user settings

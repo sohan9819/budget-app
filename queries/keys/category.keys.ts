@@ -1,6 +1,6 @@
 import { TransactionType } from '@/types';
 
-import { createQueryKeys } from './_factory';
+import { createQueryKeys } from './factory';
 
 export type CategoryFilters = {
   type: TransactionType;

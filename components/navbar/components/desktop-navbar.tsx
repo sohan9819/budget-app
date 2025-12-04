@@ -1,11 +1,10 @@
 import React from 'react';
 
-import { AuthButton } from '@/components/buttons/auth-button';
 import { ThemeSwitcherButton } from '@/components/buttons/theme-switcher-button';
 import { Logo } from '@/components/logo';
-
-import { NavbarItem } from './navbar-item';
-import { navlinks } from '../constants';
+import { NavbarItem } from '@/components/navbar/components/navbar-item';
+import { navlinks } from '@/components/navbar/constants';
+import { AuthButton } from '@/features/auth/components/buttons/auth-button';
 
 export const DesktopNavbar = () => {
   return (

@@ -6,25 +6,16 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query';
 
-import { userSettingsKeys } from '@/features/user-settings/queries/keys';
+import { CurrencyCode } from '@/features/user-settings/lib/currencies';
+import type { UserSettings } from '@/features/user-settings/schema';
 import {
   getUserSettings,
   updateUserCurrency,
 } from '@/features/user-settings/server';
-// import { apiClient } from '@/lib/api-client';
-import { CurrencyCode } from '@/lib/currencies';
-import type { UserSettings } from '@/schema/user_settings';
 
-/**
- * Client-side function to fetch user settings from API ( Not Required )
- */
-// export const fetchUserSettings = async (): Promise<UserSettings> => {
-//   const [userSettings] = await apiClient<UserSettings[]>('/api/user-settings', {
-//     method: 'GET',
-//     credentials: 'include',
-//   });
-//   return userSettings;
-// };
+export const userSettingsKeys = {
+  all: ['userSettings'] as const,
+};
 
 /**
  * React Query options for user settings query

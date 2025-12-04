@@ -7,7 +7,7 @@ import { sql } from 'drizzle-orm';
 
 import { db } from '@/db/drizzle';
 import { monthHistory, transaction, yearHistory } from '@/db/schema';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 import { CreateTransactionSchema } from '@/schema';
 import type { CreateTransaction, CreateTransactionForm } from '@/schema';
 

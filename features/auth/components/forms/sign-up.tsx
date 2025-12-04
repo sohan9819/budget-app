@@ -10,8 +10,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { PasswordInput } from '@/components/password-input';
-import { PasswordStrengthIndicator } from '@/components/password-strength-indicator';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -30,9 +28,15 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { VerifyEmail } from '@/components/verify-email';
-import { signUp, googleSignIn, githubSignIn } from '@/lib/auth-client';
-import { getPasswordStrength } from '@/lib/password';
+import { PasswordInput } from '@/features/auth/components/password-input';
+import { PasswordStrengthIndicator } from '@/features/auth/components/password-strength-indicator';
+import { VerifyEmail } from '@/features/auth/components/verify-email';
+import {
+  signUp,
+  googleSignIn,
+  githubSignIn,
+} from '@/features/auth/lib/auth-client';
+import { getPasswordStrength } from '@/features/auth/lib/password';
 import { Redirects } from '@/lib/redirects';
 import { cn, getErrorMessage } from '@/lib/utils';
 

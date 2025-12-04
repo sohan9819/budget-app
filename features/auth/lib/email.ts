@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 
-import { sendVerificationEmail } from '@/lib/auth-client';
+import { sendVerificationEmail } from '@/features/auth/lib/auth-client';
 import { Redirects } from '@/lib/redirects';
 
 export const resendVerificationEmail = (email: string) => {

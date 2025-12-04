@@ -1,7 +1,7 @@
 import type {
   PasswordStrengthIndicatorParams,
   PasswordStrengthLevel,
-} from '@/components/password-strength-indicator';
+} from '@/features/auth/components/password-strength-indicator';
 
 /**
  * Returns a password strength score between 0 and 4

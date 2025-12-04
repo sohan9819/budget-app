@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 
 /**
  * API route to fetch session for client-side React Query

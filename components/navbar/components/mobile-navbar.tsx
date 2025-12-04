@@ -3,7 +3,6 @@ import React from 'react';
 import { atom, useAtom } from 'jotai';
 import { Menu } from 'lucide-react';
 
-import { AuthButton } from '@/components/buttons/auth-button';
 import { ThemeSwitcherButton } from '@/components/buttons/theme-switcher-button';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { AuthButton } from '@/features/auth/components/buttons/auth-button';
 
 import { navlinks } from '../constants';
 import { NavbarItem } from './navbar-item';

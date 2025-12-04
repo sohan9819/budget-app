@@ -7,9 +7,9 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '@/db/drizzle';
 import { user_settings } from '@/db/schema';
-import { auth } from '@/lib/auth';
-import { CurrencyCode } from '@/lib/currencies';
-import { UpdateUserSettings } from '@/schema';
+import { auth } from '@/features/auth/lib/auth';
+import { CurrencyCode } from '@/features/user-settings/lib/currencies';
+import { UpdateUserSettings } from '@/features/user-settings/schema';
 
 export async function updateUserCurrency(currency: CurrencyCode) {
   const parsedBody = UpdateUserSettings.safeParse({ currency });

@@ -12,8 +12,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { PasswordInput } from '@/components/password-input';
-import { PasswordStrengthIndicator } from '@/components/password-strength-indicator';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -30,8 +28,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { resetPassword } from '@/lib/auth-client';
-import { getPasswordStrength } from '@/lib/password';
+import { PasswordInput } from '@/features/auth/components/password-input';
+import { PasswordStrengthIndicator } from '@/features/auth/components/password-strength-indicator';
+import { resetPassword } from '@/features/auth/lib/auth-client';
+import { getPasswordStrength } from '@/features/auth/lib/password';
 import { cn, getErrorMessage } from '@/lib/utils';
 
 const passwordVisibleAtom = atom(false);

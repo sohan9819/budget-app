@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 import { db } from '@/db/drizzle';
 import { category } from '@/db/schema';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/lib/auth';
 import { type CreateCategory, CreateCategorySchema } from '@/schema';
 
 export async function CreateCategory(categoryData: CreateCategory) {

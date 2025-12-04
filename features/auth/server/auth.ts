@@ -3,10 +3,10 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { auth } from '@/lib/auth';
-import type { SessionResponse } from '@/queries/auth/auth.queries';
+import { AuthState } from '@/features/auth/atoms';
+import { auth } from '@/features/auth/lib/auth';
 
-export async function getAuthSession(): Promise<SessionResponse> {
+export async function getAuthSession(): Promise<AuthState> {
   const sessionData = await auth.api.getSession({
     headers: await headers(),
   });
