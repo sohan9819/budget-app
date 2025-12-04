@@ -38,12 +38,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { CurrencyIcon } from '@/features/user-settings/components/currency-icon';
 import { cn } from '@/lib/utils';
 import { transactionKeys } from '@/queries/keys/transaction';
 import { CreateTransactionFormSchema, CreateTransactionForm } from '@/schema';
 import { TransactionType } from '@/types';
-
-import { CurrencyIcon } from './currency-icon';
 
 interface CreatTransactionDialogProps {
   children: ReactNode;

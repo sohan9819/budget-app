@@ -11,7 +11,7 @@ import type { UserSettings } from '@/schema/user_settings';
  */
 export function prefetchUserSettings(
   queryClient: QueryClient,
-  userSettings: UserSettings[],
+  userSettings: UserSettings,
 ) {
   // Prefetch the user settings query with the provided data
   queryClient.setQueryData(['userSettings'], userSettings);

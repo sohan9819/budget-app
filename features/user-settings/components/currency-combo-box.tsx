@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect } from 'react';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Check } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { UpdateUserCurrency } from '@/app/onboarding/_actions/user-settings';
+import { SkeletonWrapper } from '@/components/skeleton-wrapper';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -23,34 +23,39 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { selectedCurrencyAtom } from '@/features/user-settings/atoms';
+import {
+  Currencies,
+  Currency,
+  CurrencyMap,
+} from '@/features/user-settings/lib/currencies';
+import {
+  getUserSettingsQueryOptions,
+  useUserSettingsCurrencyMutation,
+} from '@/features/user-settings/queries';
+import { useUserSettingsUtils } from '@/features/user-settings/queries/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { Currencies, Currency, CurrencyMap } from '@/lib/currencies';
 import { cn } from '@/lib/utils';
-import { UserSettings } from '@/schema';
-
-import { SkeletonWrapper } from './skeleton-wrapper';
 
 const openAtom = atom(false);
-const selectedCurrencyAtom = atom<Currency | null>(null);
 
 export function CurrencyComboBox() {
   const [open, setOpen] = useAtom(openAtom);
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [selectedCurrency, setSelectedCurrency] = useAtom(selectedCurrencyAtom);
 
-  const { data, isLoading, isFetching, isError } = useQuery<UserSettings[]>({
-    queryKey: ['userSettings'],
-    queryFn: () => fetch('/api/user-settings').then((res) => res.json()),
-  });
+  const { invalidateUserSettings } = useUserSettingsUtils();
 
-  const updateCurrencyMutation = useMutation({
-    mutationFn: UpdateUserCurrency,
-    mutationKey: ['userSettings'],
-    onSuccess: (data) => {
-      const { updatedUserSettings } = data[0];
+  const { data, isLoading, isFetching, isError } = useQuery(
+    getUserSettingsQueryOptions(),
+  );
+
+  const updateCurrencyMutation = useUserSettingsCurrencyMutation({
+    onSuccess: (userSettings) => {
       const updatedCurrency =
-        CurrencyMap[updatedUserSettings.currency as Currency['value']];
+        CurrencyMap[userSettings.currency as Currency['value']];
       setSelectedCurrency(updatedCurrency);
+      invalidateUserSettings();
     },
   });
 
@@ -61,17 +66,13 @@ export function CurrencyComboBox() {
         return;
       }
 
-      toast.promise<
-        {
-          updatedUserSettings: {
-            userId: string;
-            currency: string;
-          };
-        }[]
-      >(() => updateCurrencyMutation.mutateAsync(currency.value), {
+      toast.promise<{
+        userId: string;
+        currency: string;
+      }>(() => updateCurrencyMutation.mutateAsync(currency.value), {
         loading: 'Updating Currency...',
-        success: (data) =>
-          `Currency updated successfully to ${data[0].updatedUserSettings.currency}`,
+        success: ({ currency }) =>
+          `Currency updated successfully to ${currency}`,
         error: 'Error updating currency',
       });
     },
@@ -80,8 +81,7 @@ export function CurrencyComboBox() {
 
   useEffect(() => {
     if (data && !(isLoading || isFetching) && !isError) {
-      console.log('Setting Currency');
-      setSelectedCurrency(CurrencyMap[data[0].currency as Currency['value']]);
+      setSelectedCurrency(CurrencyMap[data.currency as Currency['value']]);
     }
   }, [data, isError, isFetching, isLoading, setSelectedCurrency]);
 
@@ -152,7 +152,7 @@ function CurrencyList({
               key={value}
               value={`${value} ${label}`}
               onSelect={(value: string) => {
-                const key = value as keyof typeof CurrencyMap;
+                const key = value.split(' ')[0] as keyof typeof CurrencyMap;
                 setSelectedCurrency(CurrencyMap[key]);
                 setOpen(false);
               }}>

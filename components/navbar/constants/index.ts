@@ -11,4 +11,8 @@ export const navlinks = [
     label: 'Manage',
     link: '/manage',
   },
+  {
+    label: 'Onboarding',
+    link: '/onboarding',
+  },
 ] as const;

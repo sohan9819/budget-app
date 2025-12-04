@@ -3,37 +3,34 @@
 import { atom } from 'jotai';
 import { atomWithQuery } from 'jotai-tanstack-query';
 
-import { Currency, CURRENCY_CODES } from '@/lib/currencies';
-import { fetchUserSettings } from '@/queries/user-settings/user-settings.queries';
-import type { UserSettings } from '@/schema/user_settings';
+import {
+  Currency,
+  CURRENCY_CODES,
+} from '@/features/user-settings/lib/currencies';
+import { fetchUserSettings } from '@/features/user-settings/queries';
+import type { UserSettings } from '@/features/user-settings/schema';
+
+import { userSettingsKeys } from '../queries/keys';
 
 /**
  * Jotai atom integrated with React Query for user settings
  * This atom automatically manages fetching, caching, and refetching through React Query
  */
 export const userSettingsQueryAtom = atomWithQuery(() => ({
-  queryKey: ['userSettings'],
+  queryKey: userSettingsKeys.all,
   queryFn: fetchUserSettings,
-  staleTime: 5 * 60 * 1000, // 5 minutes
+  staleTime: 12 * 60 * 60 * 1000, // 5 minutes
   retry: 1,
   refetchOnWindowFocus: true,
   refetchOnMount: true,
 }));
 
 /**
- * Derived atoms for easy access to user settings data
- */
-export const userSettingsDataAtom = atom<UserSettings[] | undefined>((get) => {
-  const query = get(userSettingsQueryAtom);
-  return query.data;
-});
-
-/**
- * Get the first user settings object (since API returns array)
+ * Get the user settings object from api response
  */
 export const userSettingsAtom = atom<UserSettings | null>((get) => {
-  const data = get(userSettingsDataAtom);
-  return data?.[0] ?? null;
+  const { data } = get(userSettingsQueryAtom);
+  return data ?? null;
 });
 
 /**

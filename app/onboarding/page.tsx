@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 
 import { toast } from 'sonner';
 
-import { CurrencyComboBox } from '@/components/currency-combo-box';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { CurrencyComboBox } from '@/features/user-settings/components/currency-combo-box';
 import { auth } from '@/lib/auth';
 
 export default async function WizardPage() {

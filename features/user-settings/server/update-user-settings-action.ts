@@ -8,9 +8,10 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/db/drizzle';
 import { user_settings } from '@/db/schema';
 import { auth } from '@/lib/auth';
+import { CurrencyCode } from '@/lib/currencies';
 import { UpdateUserSettings } from '@/schema';
 
-export async function UpdateUserCurrency(currency: string) {
+export async function updateUserCurrency(currency: CurrencyCode) {
   const parsedBody = UpdateUserSettings.safeParse({ currency });
   if (parsedBody.error) {
     throw parsedBody.error;
@@ -26,11 +27,11 @@ export async function UpdateUserCurrency(currency: string) {
 
   const { user } = session;
 
-  const userSettings = await db
+  const [userSettings] = await db
     .update(user_settings)
     .set(parsedBody.data)
     .where(eq(user_settings.userId, user.id))
-    .returning({ updatedUserSettings: user_settings });
+    .returning();
 
   return userSettings;
 }
