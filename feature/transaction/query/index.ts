@@ -1,8 +1,4 @@
-import {
-  useMutation,
-  UseMutationOptions,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, UseMutationOptions } from '@tanstack/react-query';
 
 import {
   CreateTransactionForm,
@@ -32,39 +28,3 @@ export const useCreateTransactionMutation = (
     mutationFn: createTransaction,
     ...options,
   });
-
-export const useTransactionUtils = () => {
-  const queryClient = useQueryClient();
-
-  const invalidateAllTransactions = async () => {
-    await queryClient.invalidateQueries({ queryKey: transactionKeys.all });
-  };
-  const invalidateListsTransactions = async () => {
-    await queryClient.invalidateQueries({
-      queryKey: transactionKeys.lists(),
-    });
-  };
-  const invalidateFilterTransactions = async (filter: TransactionFilters) => {
-    await queryClient.invalidateQueries({
-      queryKey: transactionKeys.list(filter),
-    });
-  };
-
-  const invalidateDetailTransactions = async (id: string) => {
-    await queryClient.invalidateQueries({
-      queryKey: transactionKeys.detail(id),
-    });
-  };
-
-  const refetchTransactions = async () => {
-    await queryClient.refetchQueries({ queryKey: transactionKeys.all });
-  };
-
-  return {
-    invalidateAllTransactions,
-    invalidateListsTransactions,
-    invalidateFilterTransactions,
-    invalidateDetailTransactions,
-    refetchTransactions,
-  };
-};

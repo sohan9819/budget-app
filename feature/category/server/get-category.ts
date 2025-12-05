@@ -7,7 +7,7 @@ import { and, asc, eq } from 'drizzle-orm';
 import { db } from '@/db/drizzle';
 import { category } from '@/db/schema';
 import { auth } from '@/feature/auth/lib/auth';
-import { CategoryFilters } from '@/feature/category/types';
+import { CategoryFilters } from '@/feature/category/query';
 
 export async function getCategory(filters?: CategoryFilters) {
   const session = await auth.api.getSession({

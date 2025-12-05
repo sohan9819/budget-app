@@ -7,15 +7,12 @@ import {
 } from '@tanstack/react-query';
 
 import { CurrencyCode } from '@/feature/user-settings/lib/currencies';
+import { userSettingsKeys } from '@/feature/user-settings/query/keys';
 import type { UserSettings } from '@/feature/user-settings/schema';
 import {
   getUserSettings,
   updateUserCurrency,
 } from '@/feature/user-settings/server';
-
-export const userSettingsKeys = {
-  all: ['userSettings'] as const,
-};
 
 /**
  * React Query options for user settings query

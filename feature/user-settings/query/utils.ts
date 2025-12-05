@@ -2,7 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 
-import { userSettingsKeys } from '@/feature/user-settings/query';
+import { userSettingsKeys } from '@/feature/user-settings/query/keys';
 
 /**
  * Utility hook to invalidate and refetch user settings after mutations

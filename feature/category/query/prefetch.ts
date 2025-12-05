@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 
+import { categoryKeys } from '@/feature/category/query';
 import type { Category } from '@/feature/category/schema';
 
 /**
@@ -14,5 +15,5 @@ export function prefetchCategory(
   category: Category[],
 ) {
   // Prefetch the user settings query with the provided data
-  queryClient.setQueryData(['category'], category);
+  queryClient.setQueryData(categoryKeys.all, category);
 }

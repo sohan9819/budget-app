@@ -2,10 +2,17 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { categoryKeys } from '@/feature/category/query/keys';
-import { CategoryFilters } from '@/feature/category/types';
+import { getCategory } from '@/feature/category/server';
+import { TransactionType } from '@/feature/transaction/types';
+import { createQueryKeys } from '@/lib/create-query-keys';
 
-import { getCategory } from '../server/get-category';
+export type CategoryFilters = {
+  type: TransactionType;
+};
+
+export const categoryKeys = createQueryKeys<'category', CategoryFilters>(
+  'category',
+);
 
 /**
  * React Query hook for category management

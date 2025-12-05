@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 // import data from '@emoji-mart/data';
 // import Picker from '@emoji-mart/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { atom, useAtom } from 'jotai';
 import { CircleOff, PlusSquare } from 'lucide-react';
@@ -40,7 +40,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Spinner } from '@/components/ui/spinner';
-import { categoryKeys } from '@/feature/category/query/keys';
 import {
   Category,
   CreateCategory,
@@ -48,6 +47,8 @@ import {
 } from '@/feature/category/schema';
 import { TransactionType } from '@/feature/transaction/types';
 import { cn } from '@/lib/utils';
+
+import { useCategoryUtils } from '../query/utils';
 
 interface CreateCategoryDialogProps {
   type: TransactionType;
@@ -61,7 +62,7 @@ export const CreateCategoryDialog = ({
   handleCreatedCategory,
 }: CreateCategoryDialogProps) => {
   const [open, setOpen] = useAtom(openAtom);
-  const queryClient = useQueryClient();
+  const { invalidateFilterCategory } = useCategoryUtils();
   const { resolvedTheme } = useTheme();
 
   const { mutate, isPending } = useMutation({
@@ -80,7 +81,7 @@ export const CreateCategoryDialog = ({
         },
       );
 
-      queryClient.invalidateQueries({ queryKey: categoryKeys.list({ type }) });
+      invalidateFilterCategory({ type });
 
       handleCreatedCategory(newCategory);
       setOpen((prev) => !prev);
