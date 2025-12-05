@@ -15,7 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { AuthButton } from '@/features/auth/components/buttons/auth-button';
+import { AuthButton } from '@/feature/auth/components/buttons/auth-button';
 
 import { navlinks } from '../constants';
 import { NavbarItem } from './navbar-item';

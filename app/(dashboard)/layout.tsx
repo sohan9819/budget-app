@@ -3,8 +3,8 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { GlobalProvider } from '@/components/providers/globals-provider';
-import { getAuthSession } from '@/features/auth/server/auth';
-import { prefetchUserSettings } from '@/features/user-settings/queries/prefetch';
+import { getAuthSession } from '@/feature/auth/server/auth';
+import { prefetchUserSettings } from '@/feature/user-settings/query/prefetch';
 import { getQueryClient } from '@/lib/get-query-client';
 
 export default async function AppLayout({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { auth } from '@/features/auth/lib/auth';
+import { auth } from '@/feature/auth/lib/auth';
 
 // const ROOT_REGEX = /^\/$/;
 const AUTH_PAGES_REGEX =

@@ -5,9 +5,9 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 
-import { selectedCurrencyAtom } from '@/features/user-settings/atoms';
-import { CurrencyMap, Currency } from '@/features/user-settings/lib/currencies';
-import { getUserSettingsQueryOptions } from '@/features/user-settings/queries';
+import { selectedCurrencyAtom } from '@/feature/user-settings/atoms';
+import { CurrencyMap, Currency } from '@/feature/user-settings/lib/currencies';
+import { getUserSettingsQueryOptions } from '@/feature/user-settings/query';
 
 export function GlobalProvider({ children }: { children: React.ReactNode }) {
   const setSelectedCurrency = useSetAtom(selectedCurrencyAtom);

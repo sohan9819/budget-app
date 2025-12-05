@@ -4,7 +4,7 @@ import { ThemeSwitcherButton } from '@/components/buttons/theme-switcher-button'
 import { Logo } from '@/components/logo';
 import { NavbarItem } from '@/components/navbar/components/navbar-item';
 import { navlinks } from '@/components/navbar/constants';
-import { AuthButton } from '@/features/auth/components/buttons/auth-button';
+import { AuthButton } from '@/feature/auth/components/buttons/auth-button';
 
 export const DesktopNavbar = () => {
   return (

@@ -1,6 +1,6 @@
-import { CreatTransactionDialog } from '@/components/create-transaction-dialog';
 import { Button } from '@/components/ui/button';
-import { getAuthSession } from '@/features/auth/server/auth';
+import { getAuthSession } from '@/feature/auth/server/auth';
+import { CreatTransactionDialog } from '@/feature/transaction/components/create-transaction-dialog';
 
 export default async function DashboardPage() {
   const { user } = await getAuthSession();

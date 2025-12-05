@@ -1,0 +1,70 @@
+import {
+  useMutation,
+  UseMutationOptions,
+  useQueryClient,
+} from '@tanstack/react-query';
+
+import {
+  CreateTransactionForm,
+  Transaction,
+} from '@/feature/transaction/schema';
+import { createTransaction } from '@/feature/transaction/server/create-transaction-action';
+import { TransactionType } from '@/feature/transaction/types';
+import { createQueryKeys } from '@/lib/create-query-keys';
+
+export type TransactionFilters = {
+  type: TransactionType;
+};
+
+export const transactionKeys = createQueryKeys<
+  'transaction',
+  TransactionFilters
+>('transaction');
+
+/**
+ * React Query hook for user settings management
+ * This custom hook provides a mutation to update the user's currency setting
+ */
+export const useCreateTransactionMutation = (
+  options?: UseMutationOptions<Transaction, Error, CreateTransactionForm>,
+) =>
+  useMutation({
+    mutationFn: createTransaction,
+    ...options,
+  });
+
+export const useTransactionUtils = () => {
+  const queryClient = useQueryClient();
+
+  const invalidateAllTransactions = async () => {
+    await queryClient.invalidateQueries({ queryKey: transactionKeys.all });
+  };
+  const invalidateListsTransactions = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: transactionKeys.lists(),
+    });
+  };
+  const invalidateFilterTransactions = async (filter: TransactionFilters) => {
+    await queryClient.invalidateQueries({
+      queryKey: transactionKeys.list(filter),
+    });
+  };
+
+  const invalidateDetailTransactions = async (id: string) => {
+    await queryClient.invalidateQueries({
+      queryKey: transactionKeys.detail(id),
+    });
+  };
+
+  const refetchTransactions = async () => {
+    await queryClient.refetchQueries({ queryKey: transactionKeys.all });
+  };
+
+  return {
+    invalidateAllTransactions,
+    invalidateListsTransactions,
+    invalidateFilterTransactions,
+    invalidateDetailTransactions,
+    refetchTransactions,
+  };
+};

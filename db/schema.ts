@@ -12,8 +12,8 @@ import {
   pgEnum,
 } from 'drizzle-orm/pg-core';
 
-import { CURRENCY_CODES } from '@/features/user-settings/lib/currencies';
-import { TRANSACTION_TYPES } from '@/types';
+import { TRANSACTION_TYPES } from '@/feature/transaction/types';
+import { CURRENCY_CODES } from '@/feature/user-settings/lib/currencies';
 
 // --------- Pg Enums ---------
 

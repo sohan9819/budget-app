@@ -5,8 +5,11 @@ import { redirect } from 'next/navigation';
 
 import { db } from '@/db/drizzle';
 import { category } from '@/db/schema';
-import { auth } from '@/features/auth/lib/auth';
-import { type CreateCategory, CreateCategorySchema } from '@/schema';
+import { auth } from '@/feature/auth/lib/auth';
+import {
+  type CreateCategory,
+  CreateCategorySchema,
+} from '@/feature/category/schema';
 
 export async function CreateCategory(categoryData: CreateCategory) {
   const parsedBody = CreateCategorySchema.safeParse(categoryData);

@@ -14,8 +14,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { auth } from '@/features/auth/lib/auth';
-import { CurrencyComboBox } from '@/features/user-settings/components/currency-combo-box';
+import { auth } from '@/feature/auth/lib/auth';
+import { CurrencyComboBox } from '@/feature/user-settings/components/currency-combo-box';
 
 export default async function WizardPage() {
   const session = await auth.api.getSession({

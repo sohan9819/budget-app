@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useHydrateAtoms } from 'jotai/utils';
 
-import { authAtom, AuthState } from '@/features/auth/atoms';
+import { authAtom, AuthState } from '@/feature/auth/atoms';
 
 interface AuthProviderProps {
   authState: AuthState;
