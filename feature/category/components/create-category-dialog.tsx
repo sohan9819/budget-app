@@ -4,7 +4,6 @@ import React, { useCallback } from 'react';
 // import data from '@emoji-mart/data';
 // import Picker from '@emoji-mart/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { atom, useAtom } from 'jotai';
 import { CircleOff, PlusSquare } from 'lucide-react';
@@ -12,7 +11,6 @@ import { useTheme } from 'next-themes';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { CreateCategory as CreateCategoryFn } from '@/app/(dashboard)/(home)/_actions/category';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -48,6 +46,7 @@ import {
 import { TransactionType } from '@/feature/transaction/types';
 import { cn } from '@/lib/utils';
 
+import { useCreateCategoryMutation } from '../query';
 import { useCategoryUtils } from '../query/utils';
 
 interface CreateCategoryDialogProps {
@@ -65,14 +64,9 @@ export const CreateCategoryDialog = ({
   const { invalidateFilterCategory } = useCategoryUtils();
   const { resolvedTheme } = useTheme();
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: CreateCategoryFn,
-    onSuccess: async (data: Category[]) => {
-      form.reset({
-        type,
-      });
-
-      const newCategory = data[0];
+  const { mutate, isPending } = useCreateCategoryMutation({
+    onSuccess: async (newCategory: Category) => {
+      form.reset({ type });
 
       toast.success(
         `Category ${newCategory.name} ${newCategory.icon} created successfully 🎉`,
@@ -82,7 +76,6 @@ export const CreateCategoryDialog = ({
       );
 
       invalidateFilterCategory({ type });
-
       handleCreatedCategory(newCategory);
       setOpen((prev) => !prev);
     },

@@ -1,7 +1,13 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  UseMutationOptions,
+} from '@tanstack/react-query';
 
+import { Category, CreateCategoryForm } from '@/feature/category/schema';
+import { createCategory } from '@/feature/category/server';
 import { getCategory } from '@/feature/category/server';
 import { TransactionType } from '@/feature/transaction/types';
 import { createQueryKeys } from '@/lib/create-query-keys';
@@ -28,3 +34,15 @@ export const useCategoryQuery = (params?: CategoryFilters) => {
     refetchOnMount: true,
   });
 };
+
+/**
+ * React Query hook for category management
+ * This custom hook provides a mutation to create new category
+ */
+export const useCreateCategoryMutation = (
+  options?: UseMutationOptions<Category, Error, CreateCategoryForm>,
+) =>
+  useMutation({
+    mutationFn: createCategory,
+    ...options,
+  });
