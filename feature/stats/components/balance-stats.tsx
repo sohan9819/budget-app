@@ -1,3 +1,5 @@
+'use client';
+
 import React, { ReactNode, useCallback, useMemo } from 'react';
 
 import { TrendingDown, TrendingUp, Wallet } from 'lucide-react';
