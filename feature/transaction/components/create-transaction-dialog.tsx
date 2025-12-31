@@ -36,6 +36,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { CategoryComboBox } from '@/feature/category/components';
+import { useStatsUtils } from '@/feature/stats/query/utils';
 import { useCreateTransactionMutation } from '@/feature/transaction/query';
 import { useTransactionUtils } from '@/feature/transaction/query/utils';
 import {
@@ -57,6 +58,7 @@ export const CreatTransactionDialog = ({
 }: CreatTransactionDialogProps) => {
   const [open, setOpen] = useState(false);
   const { invalidateFilterTransaction } = useTransactionUtils();
+  const { invalidateStats } = useStatsUtils();
 
   const defaultFormValues = {
     type,
@@ -78,6 +80,7 @@ export const CreatTransactionDialog = ({
         });
 
         invalidateFilterTransaction({ type });
+        invalidateStats();
         form.reset();
         setOpen((prev) => !prev);
       },
@@ -95,6 +98,8 @@ export const CreatTransactionDialog = ({
         id: 'create-transaction',
       });
       createTransaction(values);
+      // console.log('Form Values : ', values);
+      // console.log('UTC Date : ', values.date.getDate());
     },
     [createTransaction],
   );

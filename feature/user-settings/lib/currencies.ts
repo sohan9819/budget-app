@@ -154,3 +154,11 @@ export const CurrencyValues = Currencies.map((c) => c.value) as [
   CurrencyCode,
   ...CurrencyCode[],
 ];
+
+export const GetFormatterForCurrency = (currency: CurrencyCode) => {
+  const locale = CurrencyMap[currency].locale;
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+  });
+};

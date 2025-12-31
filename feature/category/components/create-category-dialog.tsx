@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 
 // import data from '@emoji-mart/data';
 // import Picker from '@emoji-mart/react';
+// import { DevTool } from '@hookform/devtools';
 import { zodResolver } from '@hookform/resolvers/zod';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { atom, useAtom } from 'jotai';
@@ -40,8 +41,8 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import {
   Category,
-  CreateCategory,
-  CreateCategorySchema,
+  CreateCategoryForm,
+  CreateCategoryFormSchema,
 } from '@/feature/category/schema';
 import { TransactionType } from '@/feature/transaction/types';
 import { cn } from '@/lib/utils';
@@ -79,15 +80,17 @@ export const CreateCategoryDialog = ({
       handleCreatedCategory(newCategory);
       setOpen((prev) => !prev);
     },
-    onError: () => {
+    onError: (error) => {
+      console.log('Category Error : ', error);
       toast.error('Something went wrong', {
         id: 'create-category',
+        description: `${error.message}`,
       });
     },
   });
 
-  const form = useForm<CreateCategory>({
-    resolver: zodResolver(CreateCategorySchema),
+  const form = useForm<CreateCategoryForm>({
+    resolver: zodResolver(CreateCategoryFormSchema),
     defaultValues: {
       name: '',
       icon: '',
@@ -95,8 +98,9 @@ export const CreateCategoryDialog = ({
     },
   });
 
-  const onSubmit: SubmitHandler<CreateCategory> = useCallback(
-    (values: CreateCategory) => {
+  const onSubmit: SubmitHandler<CreateCategoryForm> = useCallback(
+    (values: CreateCategoryForm) => {
+      console.log('Creating a new catgeory');
       toast.loading('Creating category...', {
         id: 'create-category',
       });
@@ -207,7 +211,7 @@ export const CreateCategoryDialog = ({
                             style={{
                               width: '40vw',
                               minWidth: '20rem',
-                              height: '40vh',
+                              height: '45vh',
                               minHeight: '15rem',
                             }}
                           />
@@ -233,6 +237,7 @@ export const CreateCategoryDialog = ({
             </DialogFooter>
           </form>
         </Form>
+        {/* <DevTool control={form.control} /> */}
       </DialogContent>
     </Dialog>
   );
