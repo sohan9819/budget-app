@@ -5,7 +5,10 @@ import { Redirects } from '@/lib/redirects';
 const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
   // ! Comment the below line to use relative URLs in better-auth and test authentication across devices in the same network
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL:
+    process.env.NODE_ENV === 'production'
+      ? process.env.BETTER_AUTH_URL
+      : undefined,
 });
 
 export const {

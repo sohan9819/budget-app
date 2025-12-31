@@ -98,8 +98,6 @@ export const CreatTransactionDialog = ({
         id: 'create-transaction',
       });
       createTransaction(values);
-      // console.log('Form Values : ', values);
-      // console.log('UTC Date : ', values.date.getDate());
     },
     [createTransaction],
   );

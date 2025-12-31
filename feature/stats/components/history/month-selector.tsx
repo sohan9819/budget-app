@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+'use client';
+
+import React from 'react';
 
 import { useAtom } from 'jotai';
 import { Star } from 'lucide-react';
@@ -29,10 +31,6 @@ export const MonthSelector = () => {
     label: new Date(2000, i).toLocaleString('default', { month: 'long' }),
     isCurrent: i === currentMonth,
   }));
-
-  useEffect(() => {
-    console.log('Selected period changed:', period);
-  }, [period]);
 
   return (
     <Select
