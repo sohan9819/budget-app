@@ -13,11 +13,13 @@ export const auth = betterAuth({
   trustedOrigins:
     process.env.NODE_ENV === 'production'
       ? [process.env.BETTER_AUTH_URL as string]
-      : [
+      : process.env.NODE_ENV === 'test'
+      ? [
           'http://192.168.0.101:3000',
           'http://localhost:3000', // For local development
           // 'myapp://', // For deep linking in mobile apps
-        ],
+        ]
+      : ['*'],
   logger: {
     disabled: false,
     disableColors: false,

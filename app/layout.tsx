@@ -31,6 +31,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log('App Node Env : ', process.env.NODE_ENV);
   return (
     <html lang='en' style={{ colorScheme: 'dark' }} suppressHydrationWarning>
       <head>
