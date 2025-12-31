@@ -34,8 +34,6 @@ export function MonthHistoryBarChart({
     expense: d.expense,
   }));
 
-  console.log('MonthHistoryBarChart data:', chartData);
-
   return (
     <Card>
       <CardHeader>
