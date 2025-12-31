@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { Menu } from 'lucide-react';
 
-import { AuthButton } from '@/components/buttons/auth-button';
 import { ThemeSwitcherButton } from '@/components/buttons/theme-switcher-button';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
@@ -16,10 +15,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { AuthButton } from '@/feature/auth/components/buttons/auth-button';
 
-import { isNavbarOpenAtom } from '../atoms';
 import { navlinks } from '../constants';
 import { NavbarItem } from './navbar-item';
+
+const isNavbarOpenAtom = atom(false);
 
 export const MobileNavbar = () => {
   const [isOpen, setIsOpen] = useAtom(isNavbarOpenAtom);

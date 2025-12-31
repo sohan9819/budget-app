@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 
 import { toast } from 'sonner';
 
-import { CurrencyComboBox } from '@/components/currency-combo-box';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +14,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { auth } from '@/lib/auth';
+import { auth } from '@/feature/auth/lib/auth';
+import { CurrencyComboBox } from '@/feature/user-settings/components/currency-combo-box';
 
 export default async function WizardPage() {
   const session = await auth.api.getSession({
