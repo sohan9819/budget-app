@@ -11,10 +11,10 @@ export const fillMissingMonths = (
   }
 
   return Array.from({ length: 12 }, (_, i) => {
-    const month = i + 1; // 1–12
+    const month = i; // 0–11
 
     return (
-      byMonth.get(month) ?? {
+      byMonth.get(i) ?? {
         year,
         month,
         income: 0,
