@@ -3,8 +3,7 @@
 import React from 'react';
 
 import { differenceInDays, startOfMonth } from 'date-fns';
-import { atom, useAtom } from 'jotai';
-// import { DateRange } from 'react-day-picker';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { toast } from 'sonner';
 
 import { DateRangePicker } from '@/components/ui/date-range-picker';
@@ -12,19 +11,16 @@ import { BalanceStats } from '@/feature/stats/components/balance-stats';
 import { CategoryStats } from '@/feature/stats/components/category-stats';
 import { MAX_DATE_RANGE_DAYS } from '@/feature/stats/components/overview/constants';
 import { DateRange } from '@/feature/stats/schema';
-import { UserSettings } from '@/feature/user-settings/schema';
-
-interface OverviewProps {
-  userSettings: UserSettings;
-}
+import { userSettingsAtom } from '@/feature/user-settings/atoms';
 
 const dateRangeAtom = atom<DateRange>({
   from: startOfMonth(new Date()),
   to: new Date(),
 });
 
-export const Overview = ({ userSettings }: OverviewProps) => {
+export const Overview = () => {
   const [dateRange, setDateRange] = useAtom(dateRangeAtom);
+  const userSettings = useAtomValue(userSettingsAtom);
 
   return (
     <>

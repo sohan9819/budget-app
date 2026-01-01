@@ -55,3 +55,14 @@ export const fillMissingDays = (
     );
   });
 };
+
+export const fillMissingYears = (years: number[]): number[] => {
+  const currentYear = new Date().getFullYear();
+  if (!years.length) return [currentYear];
+  const startYear = years[0];
+
+  return Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => startYear + i,
+  );
+};

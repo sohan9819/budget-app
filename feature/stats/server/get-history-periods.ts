@@ -8,7 +8,9 @@ import { db } from '@/db/drizzle';
 import { monthHistory } from '@/db/schema';
 import { auth } from '@/feature/auth/lib/auth';
 
-export const getHistoryPeriods = async () => {
+import { fillMissingYears } from '../helper';
+
+export const getHistoryPeriods = async (): Promise<number[]> => {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -25,10 +27,5 @@ export const getHistoryPeriods = async () => {
       .orderBy(asc(monthHistory.year))
   ).map((r) => r.year);
 
-  if (years.length === 0) {
-    // Return the current year
-    return [new Date().getFullYear()];
-  }
-
-  return years;
+  return fillMissingYears(years);
 };

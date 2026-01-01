@@ -9,7 +9,7 @@ import {
 import { CurrencyCode } from '@/feature/user-settings/lib/currencies';
 import type { UserSettings } from '@/feature/user-settings/schema';
 import {
-  getUserSettings,
+  getUserSettingsQueryFn,
   updateUserCurrency,
 } from '@/feature/user-settings/server';
 
@@ -22,7 +22,7 @@ export const userSettingsKeys = {
  */
 export const getUserSettingsQueryOptions = () =>
   queryOptions({
-    queryFn: getUserSettings,
+    queryFn: getUserSettingsQueryFn,
     queryKey: userSettingsKeys.all,
     staleTime: 12 * 60 * 60 * 1000, // 12 hours
     retry: 1,
@@ -38,7 +38,7 @@ export const useUserSettingsQuery = (
   options?: UseQueryOptions<UserSettings, Error>,
 ) => {
   return useQuery({
-    queryFn: getUserSettings,
+    queryFn: getUserSettingsQueryFn,
     queryKey: userSettingsKeys.all,
     staleTime: 12 * 60 * 60 * 1000, // 12 hours
     retry: 1,
@@ -59,4 +59,14 @@ export const useUserSettingsCurrencyMutation = (
     mutationFn: updateUserCurrency,
     mutationKey: userSettingsKeys.all,
     ...options,
+  });
+
+export const getUserSettingsDALQueryOptions = () =>
+  queryOptions({
+    queryFn: getUserSettingsQueryFn,
+    queryKey: [...userSettingsKeys.all, 'dal'],
+    staleTime: 12 * 60 * 60 * 1000, // 12 hours
+    retry: 1,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });

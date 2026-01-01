@@ -5,7 +5,9 @@ import { DrizzleQueryError } from 'drizzle-orm';
 import {
   createErrorReturn,
   createSuccessReturn,
+  DAL_ERROR_META,
   DalError,
+  DalQueryError,
   DalReturn,
   ThrowableDalError,
 } from '@/dal/types';
@@ -80,19 +82,66 @@ export async function dalDbOperation<T>(operation: () => Promise<T>) {
   }
 }
 
-export function dalFormatErrorMessage(error: DalError) {
-  const type = error.type;
+export function dalFormatErrorMessage(error: DalError): string {
+  const meta = DAL_ERROR_META[error.type];
 
   switch (error.type) {
-    case 'no-user':
-      return 'You must be logged in to perform this action.';
-    case 'no-access':
-      return 'You do not have permission to perform this action.';
-    case 'drizzle-error':
-      return `A database error occurred`;
-    case 'unknown-error':
-      return `An unknown error occurred`;
+    case 'invalid-params':
+      return error.reason ? `${meta.message} (${error.reason})` : meta.message;
+
+    case 'not-found':
+      return error.entity ? `${meta.message} (${error.entity})` : meta.message;
+
+    case 'conflict':
+      return error.reason ? `${meta.message} (${error.reason})` : meta.message;
+
     default:
-      throw new Error(`Unhandled error type: ${type as never}`);
+      return meta.message;
   }
+}
+
+/**
+ * Converts a DAL function to a React Query compatible function
+ * This function unwraps the DalReturn, throwing an error on failure
+ * and returning the data on success, making it compatible with React Query's error handling
+ *
+ * @example
+ * ```ts
+ * const queryFn = dalToQueryFn(() => getUserSettingsDal());
+ * // Can now be used in React Query:
+ * useQuery({ queryFn });
+ * ```
+ */
+export function dalToQueryFn<T, E extends DalError>(
+  dalFunction: () => Promise<DalReturn<T, E>>,
+): () => Promise<T> {
+  return async () => {
+    const result = await dalFunction();
+    if (result.success) {
+      return result.data;
+    }
+    // Throw the error so React Query can catch it in the error state
+    throw new DalQueryError(result.error);
+  };
+}
+
+// TODO : Can be removed if not used anywhere
+/**
+ * Converts a DAL function result to a React Query compatible value
+ * This is useful when you already have a DalReturn and want to unwrap it
+ *
+ * @example
+ * ```ts
+ * const result = await getUserSettingsDal();
+ * const data = await dalUnwrap(result); // throws if error, returns data if success
+ * ```
+ */
+export async function dalUnwrap<T, E extends DalError>(
+  dalReturn: Promise<DalReturn<T, E>> | DalReturn<T, E>,
+): Promise<T> {
+  const result = await Promise.resolve(dalReturn);
+  if (result.success) {
+    return result.data;
+  }
+  throw new DalQueryError(result.error);
 }

@@ -13,16 +13,12 @@ import {
   Timeframe,
   YearHistoryData,
 } from '@/feature/stats/types';
+import { userSettingsAtom } from '@/feature/user-settings/atoms';
 import { GetFormatterForCurrency } from '@/feature/user-settings/lib/currencies';
-import { UserSettings } from '@/feature/user-settings/schema';
 
 import { HistoryPeriodSelector } from './history-period-selector';
 import { useHistoryStats } from '../../query';
 import { HistoryBarChart } from '../chart';
-
-interface HistoryProps {
-  userSettings: UserSettings;
-}
 
 export const timeframeAtom = atom<Timeframe>(Timeframe.MONTH);
 export const periodAtom = atom<Period>({
@@ -30,9 +26,10 @@ export const periodAtom = atom<Period>({
   year: new Date().getFullYear(),
 });
 
-export const History = ({ userSettings }: HistoryProps) => {
+export const History = () => {
   const timeframe = useAtomValue(timeframeAtom);
   const period = useAtomValue(periodAtom);
+  const userSettings = useAtomValue(userSettingsAtom);
 
   const formatter = useMemo(() => {
     return GetFormatterForCurrency(userSettings.currency);
