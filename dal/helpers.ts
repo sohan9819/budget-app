@@ -112,11 +112,12 @@ export function dalFormatErrorMessage(error: DalError): string {
  * useQuery({ queryFn });
  * ```
  */
-export function dalToQueryFn<T, E extends DalError>(
-  dalFunction: () => Promise<DalReturn<T, E>>,
-): () => Promise<T> {
-  return async () => {
-    const result = await dalFunction();
+
+export function dalToQueryFn<Tfn, T, E extends DalError>(
+  dalFunction: (args: Tfn) => Promise<DalReturn<T, E>>,
+): (args: Tfn) => Promise<T> {
+  return async (args: Tfn) => {
+    const result = await dalFunction(args);
     if (result.success) {
       return result.data;
     }
@@ -143,5 +144,6 @@ export async function dalUnwrap<T, E extends DalError>(
   if (result.success) {
     return result.data;
   }
+
   throw new DalQueryError(result.error);
 }

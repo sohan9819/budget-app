@@ -2,13 +2,12 @@
 
 import { useEffect } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { toast } from 'sonner';
 
 import { DalQueryError } from '@/dal/types';
 import { userSettingsAtom } from '@/feature/user-settings/atoms';
-import { getUserSettingsQueryOptions } from '@/feature/user-settings/query';
+import { useUserSettingsQuery } from '@/feature/user-settings/query';
 
 import ErrorScreen from '../error-screen';
 import { Logo } from '../logo';
@@ -16,9 +15,8 @@ import { Spinner } from '../ui/spinner';
 
 export function GlobalProvider({ children }: { children: React.ReactNode }) {
   const setUserSettings = useSetAtom(userSettingsAtom);
-  const { data, isLoading, isFetching, isError, error, refetch } = useQuery(
-    getUserSettingsQueryOptions(),
-  );
+  const { data, isLoading, isFetching, isError, error, refetch } =
+    useUserSettingsQuery();
 
   useEffect(() => {
     if (data && !(isLoading || isFetching) && !isError) {
@@ -30,9 +28,9 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
         console.log(error.code); // analytics
         console.log(error.devMessage); // logs
         console.log(error.cause); // root cause
-
-        toast.error('Unable to fetch user data', {
-          description: error?.message,
+        console.log(error.type); // root cause
+        toast.error('Error fetching user data', {
+          description: error.message,
           action: {
             label: 'Try Again',
             onClick: () => refetch(),
@@ -40,6 +38,13 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
         });
       } else {
         // refetch();
+        toast.error('Error fetching user data', {
+          description: error?.message,
+          action: {
+            label: 'Try Again',
+            onClick: () => refetch(),
+          },
+        });
         console.log('Error : ', error);
       }
     }

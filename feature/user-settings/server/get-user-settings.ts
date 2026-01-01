@@ -2,7 +2,6 @@
 
 import { eq } from 'drizzle-orm';
 
-import { dalToQueryFn } from '@/dal/helpers';
 import { dalRequireAuth, dalDbOperation } from '@/dal/helpers';
 import { DalError, DalReturn } from '@/dal/types';
 import { db } from '@/db/drizzle';
@@ -28,11 +27,7 @@ export const getUserSettings = async (): Promise<
         [userSettings] = insertedUserSettings;
       }
 
-      throw new Error('Hello world');
-
       return userSettings;
     }),
   );
 };
-
-export const getUserSettingsQueryFn = dalToQueryFn(getUserSettings);
