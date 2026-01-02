@@ -27,7 +27,7 @@ export function YearHistoryBarChart({
   formatter,
 }: YearHistoryBarChartProps) {
   const chartData = data.map((d) => ({
-    month: new Date(0, d.month - 1).toLocaleString('default', {
+    month: new Date(0, d.month).toLocaleString('default', {
       month: 'short',
     }),
     income: d.income,

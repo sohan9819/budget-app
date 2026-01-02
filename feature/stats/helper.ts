@@ -11,10 +11,10 @@ export const fillMissingMonths = (
   }
 
   return Array.from({ length: 12 }, (_, i) => {
-    const month = i + 1; // 1–12
+    const month = i; // 0–11
 
     return (
-      byMonth.get(month) ?? {
+      byMonth.get(i) ?? {
         year,
         month,
         income: 0,
@@ -54,4 +54,15 @@ export const fillMissingDays = (
       }
     );
   });
+};
+
+export const fillMissingYears = (years: number[]): number[] => {
+  const currentYear = new Date().getFullYear();
+  if (!years.length) return [currentYear];
+  const startYear = years[0];
+
+  return Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => startYear + i,
+  );
 };

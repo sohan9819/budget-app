@@ -1,34 +1,24 @@
 'use server';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
 
 import { asc, eq } from 'drizzle-orm';
 
+import { dalDbOperation, dalRequireAuth } from '@/dal/helpers';
 import { db } from '@/db/drizzle';
 import { monthHistory } from '@/db/schema';
-import { auth } from '@/feature/auth/lib/auth';
 
-export const getHistoryPeriods = async () => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+import { fillMissingYears } from '../helper';
 
-  if (!session?.session || !session?.user) {
-    redirect('/signin');
-  }
+export const getHistoryPeriods = async () =>
+  dalRequireAuth((user) =>
+    dalDbOperation(async () => {
+      const years = (
+        await db
+          .selectDistinctOn([monthHistory.year], { year: monthHistory.year })
+          .from(monthHistory)
+          .where(eq(monthHistory.userId, user.id))
+          .orderBy(asc(monthHistory.year))
+      ).map((r) => r.year);
 
-  const years = (
-    await db
-      .selectDistinctOn([monthHistory.year], { year: monthHistory.year })
-      .from(monthHistory)
-      .where(eq(monthHistory.userId, session.user.id))
-      .orderBy(asc(monthHistory.year))
-  ).map((r) => r.year);
-
-  if (years.length === 0) {
-    // Return the current year
-    return [new Date().getFullYear()];
-  }
-
-  return years;
-};
+      return fillMissingYears(years);
+    }),
+  );

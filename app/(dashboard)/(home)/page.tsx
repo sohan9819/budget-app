@@ -1,21 +1,11 @@
-import { toast } from 'sonner';
-
 import { Button } from '@/components/ui/button';
 import { getAuthSession } from '@/feature/auth/server/auth';
 import { History } from '@/feature/stats/components/history';
 import { Overview } from '@/feature/stats/components/overview';
 import { CreatTransactionDialog } from '@/feature/transaction/components/create-transaction-dialog';
-import { getUserSettings } from '@/feature/user-settings/mutations';
 
 export default async function DashboardPage() {
   const { user } = await getAuthSession();
-  const userSettingsResponse = await getUserSettings();
-
-  if (!userSettingsResponse.success) {
-    toast.error('Unable to fetch user data', {
-      description: userSettingsResponse.error.type,
-    });
-  }
 
   return (
     <div className='h-full bg-background'>
@@ -34,12 +24,8 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
-      {userSettingsResponse.success && (
-        <Overview userSettings={userSettingsResponse.data} />
-      )}
-      {userSettingsResponse.success && (
-        <History userSettings={userSettingsResponse.data} />
-      )}
+      <Overview />
+      <History />
     </div>
   );
 }

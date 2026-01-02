@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { Check } from 'lucide-react';
 import { toast } from 'sonner';
@@ -30,8 +29,8 @@ import {
   CurrencyMap,
 } from '@/feature/user-settings/lib/currencies';
 import {
-  getUserSettingsQueryOptions,
   useUserSettingsCurrencyMutation,
+  useUserSettingsQuery,
 } from '@/feature/user-settings/query';
 import { useUserSettingsUtils } from '@/feature/user-settings/query/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -46,9 +45,7 @@ export function CurrencyComboBox() {
 
   const { invalidateUserSettings } = useUserSettingsUtils();
 
-  const { data, isLoading, isFetching, isError } = useQuery(
-    getUserSettingsQueryOptions(),
-  );
+  const { data, isLoading, isFetching, isError } = useUserSettingsQuery();
 
   const updateCurrencyMutation = useUserSettingsCurrencyMutation({
     onSuccess: (userSettings) => {

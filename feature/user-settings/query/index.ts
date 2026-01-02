@@ -6,23 +6,25 @@ import {
   UseQueryOptions,
 } from '@tanstack/react-query';
 
+import { DalQueryError } from '@/dal/types';
 import { CurrencyCode } from '@/feature/user-settings/lib/currencies';
 import type { UserSettings } from '@/feature/user-settings/schema';
-import {
-  getUserSettings,
-  updateUserCurrency,
-} from '@/feature/user-settings/server';
+import { createQueryKeys } from '@/lib/create-query-keys';
 
-export const userSettingsKeys = {
-  all: ['userSettings'] as const,
-};
+import {
+  getUserSettingsQueryFn,
+  updateUserCurrencyMutationFn,
+} from './queryFns';
+
+export const userSettingsKeys = createQueryKeys<'userSettings'>('userSettings');
 
 /**
- * React Query options for user settings query
+ * Get Query Options for user-settings
+ * @returns Query Options for user-settings
  */
 export const getUserSettingsQueryOptions = () =>
   queryOptions({
-    queryFn: getUserSettings,
+    queryFn: getUserSettingsQueryFn,
     queryKey: userSettingsKeys.all,
     staleTime: 12 * 60 * 60 * 1000, // 12 hours
     retry: 1,
@@ -31,14 +33,15 @@ export const getUserSettingsQueryOptions = () =>
   });
 
 /**
- * React Query hook for user settings management
- * This custom hook provides a query to fetch the user's settings
+ * Hook to get user settings
+ * @param options Query options
+ * @returns user settings query result
  */
 export const useUserSettingsQuery = (
-  options?: UseQueryOptions<UserSettings, Error>,
+  options?: UseQueryOptions<UserSettings, Error | DalQueryError>,
 ) => {
   return useQuery({
-    queryFn: getUserSettings,
+    queryFn: getUserSettingsQueryFn,
     queryKey: userSettingsKeys.all,
     staleTime: 12 * 60 * 60 * 1000, // 12 hours
     retry: 1,
@@ -49,14 +52,19 @@ export const useUserSettingsQuery = (
 };
 
 /**
- * React Query hook for user settings management
- * This custom hook provides a mutation to update the user's currency setting
+ * Hook to update user settings currency
+ * @param options Query options
+ * @returns user settings mutation result
  */
 export const useUserSettingsCurrencyMutation = (
-  options?: UseMutationOptions<UserSettings, Error, CurrencyCode>,
+  options?: UseMutationOptions<
+    UserSettings,
+    Error | DalQueryError,
+    CurrencyCode
+  >,
 ) =>
   useMutation({
-    mutationFn: updateUserCurrency,
+    mutationFn: updateUserCurrencyMutationFn,
     mutationKey: userSettingsKeys.all,
     ...options,
   });

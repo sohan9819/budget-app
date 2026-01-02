@@ -1,97 +1,83 @@
 'use server';
 
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
-
 import { sql } from 'drizzle-orm';
 
+import { dalDbOperation, dalRequireAuth } from '@/dal/helpers';
 import { db } from '@/db/drizzle';
 import { monthHistory, transaction, yearHistory } from '@/db/schema';
-import { auth } from '@/feature/auth/lib/auth';
 import {
+  CreateTransaction,
   CreateTransactionForm,
-  CreateTransactionSchema,
 } from '@/feature/transaction/schema';
 
-export async function createTransaction(
+export const createTransaction = async (
   transactionFormData: CreateTransactionForm,
-) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.session || !session?.user) {
-    redirect('/signin');
-  }
-
-  const { user } = session;
-
-  const { data: newTransaction, error: newTransactionError } =
-    CreateTransactionSchema.safeParse({
-      ...transactionFormData,
-      userId: user.id,
-    });
-
-  if (newTransactionError) {
-    throw newTransactionError;
-  }
-
-  const day = newTransaction.date.getDate();
-  const month = newTransaction.date.getMonth();
-  const year = newTransaction.date.getFullYear();
-
-  const income = newTransaction.type === 'income' ? newTransaction.amount : 0;
-  const expense = newTransaction.type === 'expense' ? newTransaction.amount : 0;
-
-  return db.transaction(async (tx) => {
-    // Insert the transaction
-    const [createdTransaction] = await tx
-      .insert(transaction)
-      .values(newTransaction)
-      .returning();
-
-    // Upsert Month History
-    await tx
-      .insert(monthHistory)
-      .values({
+) =>
+  dalRequireAuth((user) =>
+    dalDbOperation(async () => {
+      const newTransaction: CreateTransaction = {
+        ...transactionFormData,
         userId: user.id,
-        day,
-        month,
-        year,
-        income,
-        expense,
-      })
-      .onConflictDoUpdate({
-        target: [
-          monthHistory.day,
-          monthHistory.month,
-          monthHistory.year,
-          monthHistory.userId,
-        ],
-        set: {
-          income: sql`${monthHistory.income} + ${income}`,
-          expense: sql`${monthHistory.expense} + ${expense}`,
-        },
-      });
+      };
+      const day = newTransaction.date.getDate();
+      const month = newTransaction.date.getMonth();
+      const year = newTransaction.date.getFullYear();
 
-    // Upsert Year History
-    await tx
-      .insert(yearHistory)
-      .values({
-        userId: user.id,
-        month,
-        year,
-        income,
-        expense,
-      })
-      .onConflictDoUpdate({
-        target: [yearHistory.month, yearHistory.year, yearHistory.userId],
-        set: {
-          income: sql`${yearHistory.income} + ${income}`,
-          expense: sql`${yearHistory.expense} + ${expense}`,
-        },
-      });
+      const income =
+        newTransaction.type === 'income' ? newTransaction.amount : 0;
+      const expense =
+        newTransaction.type === 'expense' ? newTransaction.amount : 0;
 
-    return createdTransaction;
-  });
-}
+      return db.transaction(async (tx) => {
+        // Insert the transaction
+        const [createdTransaction] = await tx
+          .insert(transaction)
+          .values(newTransaction)
+          .returning();
+
+        // Upsert Month History
+        await tx
+          .insert(monthHistory)
+          .values({
+            userId: user.id,
+            day,
+            month,
+            year,
+            income,
+            expense,
+          })
+          .onConflictDoUpdate({
+            target: [
+              monthHistory.day,
+              monthHistory.month,
+              monthHistory.year,
+              monthHistory.userId,
+            ],
+            set: {
+              income: sql`${monthHistory.income} + ${income}`,
+              expense: sql`${monthHistory.expense} + ${expense}`,
+            },
+          });
+
+        // Upsert Year History
+        await tx
+          .insert(yearHistory)
+          .values({
+            userId: user.id,
+            month,
+            year,
+            income,
+            expense,
+          })
+          .onConflictDoUpdate({
+            target: [yearHistory.month, yearHistory.year, yearHistory.userId],
+            set: {
+              income: sql`${yearHistory.income} + ${income}`,
+              expense: sql`${yearHistory.expense} + ${expense}`,
+            },
+          });
+
+        return createdTransaction;
+      });
+    }),
+  );
