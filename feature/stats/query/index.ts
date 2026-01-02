@@ -1,12 +1,16 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { DateRange } from '@/feature/stats/schema';
-import { getBalanceStats, getCategoryStats } from '@/feature/stats/server';
 import { createQueryKeys } from '@/lib/create-query-keys';
 
-import { getHistoryPeriods } from '../server/get-history-periods';
-import { getHistoryStats } from '../server/get-history-stats';
-import { MonthHistoryData, Period, Timeframe, YearHistoryData } from '../types';
+import {
+  getHistoryPeriodsFn,
+  getBalanceStatsFn,
+  getCategoryStatsFn,
+  getHistoryStatsFn,
+} from './queryFns';
+import { GetHistoryStatsParam } from '../server';
+import { Period, Timeframe } from '../types';
 
 export enum StatsType {
   BALANCE = 'balance',
@@ -30,7 +34,7 @@ export const statsKeys = createQueryKeys<
 export const useBalanceStats = (dateRange: DateRange) => {
   return useQuery({
     queryKey: statsKeys.typeList(StatsType.BALANCE, { dateRange }),
-    queryFn: () => getBalanceStats(dateRange),
+    queryFn: () => getBalanceStatsFn(dateRange),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
     refetchOnWindowFocus: true,
@@ -41,7 +45,7 @@ export const useBalanceStats = (dateRange: DateRange) => {
 export const useCategoryStats = (dateRange: DateRange) => {
   return useQuery({
     queryKey: statsKeys.typeList(StatsType.CATEGORY, { dateRange }),
-    queryFn: () => getCategoryStats(dateRange),
+    queryFn: () => getCategoryStatsFn(dateRange),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
     refetchOnWindowFocus: true,
@@ -52,7 +56,7 @@ export const useCategoryStats = (dateRange: DateRange) => {
 export const useHistoryPeriods = () => {
   return useQuery({
     queryKey: statsKeys.typeLists(StatsType.HISTORY),
-    queryFn: () => getHistoryPeriods(),
+    queryFn: getHistoryPeriodsFn,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
     refetchOnWindowFocus: true,
@@ -60,32 +64,10 @@ export const useHistoryPeriods = () => {
   });
 };
 
-// ---------- Overload Signatures ----------
-export function useHistoryStats(
-  timeframe: Timeframe.MONTH,
-  { year, month }: Period,
-): UseQueryResult<MonthHistoryData[]>;
-
-export function useHistoryStats(
-  timeframe: Timeframe.YEAR,
-  { year, month }: Period,
-): UseQueryResult<YearHistoryData[]>;
-// ---------- Overload Signatures ----------
-
-export function useHistoryStats(timeframe: Timeframe, period: Period) {
+export function useHistoryStats(params: GetHistoryStatsParam) {
   return useQuery({
-    queryKey: statsKeys.typeList(StatsType.HISTORY, {
-      timeframe,
-      period,
-    }),
-    queryFn: () => {
-      switch (timeframe) {
-        case Timeframe.MONTH:
-          return getHistoryStats(Timeframe.MONTH, period);
-        case Timeframe.YEAR:
-          return getHistoryStats(Timeframe.YEAR, period);
-      }
-    },
+    queryKey: statsKeys.typeList(StatsType.HISTORY, params),
+    queryFn: () => getHistoryStatsFn(params),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
     refetchOnWindowFocus: true,

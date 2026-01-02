@@ -1,3 +1,5 @@
+'use client';
+
 import { dalToQueryFn } from '@/dal/helpers';
 import { DalError } from '@/dal/types';
 

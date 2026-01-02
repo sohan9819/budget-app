@@ -1,49 +1,71 @@
 'use server';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
 
 import { and, asc, eq, sum } from 'drizzle-orm';
 
+import { dalDbOperation, dalRequireAuth } from '@/dal/helpers';
 import { db } from '@/db/drizzle';
 import { monthHistory, yearHistory } from '@/db/schema';
-import { auth } from '@/feature/auth/lib/auth';
 
 import { fillMissingDays, fillMissingMonths } from '../helper';
 import { YearHistoryData, MonthHistoryData, Period, Timeframe } from '../types';
 
 // ---------- Overload Signatures ----------
-export async function getHistoryStats(
-  timeframe: Timeframe.MONTH,
-  { year, month }: Period,
-): Promise<MonthHistoryData[]>;
+// export async function getHistoryStats(
+//   timeframe: Timeframe.MONTH,
+//   { year, month }: Period,
+// ): Promise<MonthHistoryData[]>;
 
-export async function getHistoryStats(
-  timeframe: Timeframe.YEAR,
-  { year, month }: Period,
-): Promise<YearHistoryData[]>;
+// export async function getHistoryStats(
+//   timeframe: Timeframe.YEAR,
+//   { year, month }: Period,
+// ): Promise<YearHistoryData[]>;
 // ---------- Overload Signatures ----------
 
-export async function getHistoryStats(
-  timeframe: Timeframe,
-  { year, month }: Period,
-) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+// export async function getHistoryStats(
+//   timeframe: Timeframe,
+//   { year, month }: Period,
+// ) {
+//   const session = await auth.api.getSession({
+//     headers: await headers(),
+//   });
 
-  if (!session?.session || !session?.user) {
-    redirect('/signin');
-  }
+//   if (!session?.session || !session?.user) {
+//     redirect('/signin');
+//   }
 
-  switch (timeframe) {
-    case Timeframe.MONTH:
-      return await getMonthHistoryData(session.user.id, year, month);
-    case Timeframe.YEAR:
-      return await getYearHistoryData(session.user.id, year);
-    default:
-      throw new Error('Invalid timeframe');
-  }
-}
+//   switch (timeframe) {
+//     case Timeframe.MONTH:
+//       return await getMonthHistoryData(session.user.id, year, month);
+//     case Timeframe.YEAR:
+//       return await getYearHistoryData(session.user.id, year);
+//     default:
+//       throw new Error('Invalid timeframe');
+//   }
+// }
+
+export type GetHistoryStatsParam = {
+  timeframe: Timeframe;
+  period: Period;
+};
+
+export const getHistoryStats = async ({
+  timeframe,
+  period: { year, month },
+}: GetHistoryStatsParam) =>
+  dalRequireAuth((user) =>
+    dalDbOperation(
+      async (): Promise<YearHistoryData[] | MonthHistoryData[]> => {
+        switch (timeframe) {
+          case Timeframe.MONTH:
+            return await getMonthHistoryData(user.id, year, month);
+          case Timeframe.YEAR:
+            return await getYearHistoryData(user.id, year);
+          default:
+            throw new Error('Invalid timeframe');
+        }
+      },
+    ),
+  );
 
 const getYearHistoryData = async (userId: string, year: number) => {
   const data: YearHistoryData[] = await db

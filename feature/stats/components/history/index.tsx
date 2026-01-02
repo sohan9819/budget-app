@@ -35,11 +35,10 @@ export const History = () => {
     return GetFormatterForCurrency(userSettings.currency);
   }, [userSettings.currency]);
 
-  const monthStats = useHistoryStats(Timeframe.MONTH, period);
-  const yearStats = useHistoryStats(Timeframe.YEAR, period);
-
-  const { data: historyStats, isLoading } =
-    timeframe === Timeframe.MONTH ? monthStats : yearStats;
+  const { data: historyStats, isLoading } = useHistoryStats({
+    timeframe,
+    period,
+  });
   const statsAvailable = historyStats && historyStats.length > 0;
 
   const renderChart = () => {
