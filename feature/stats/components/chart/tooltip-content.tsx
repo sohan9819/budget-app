@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 
+import { format } from 'date-fns';
 import CountUp from 'react-countup';
 
 import { ChartConfig } from '@/components/ui/chart';
@@ -47,13 +48,16 @@ export const TooltipContent = ({
   const date = new Date(Number(year), Number(month), Number(day));
 
   // TODO : Fromat date based on locale for both the timeFrames
+  // const dateString = day
+  //   ? date.toLocaleDateString('en-IN', {
+  //       day: '2-digit',
+  //       month: 'short',
+  //       year: 'numeric',
+  //     })
+  //   : label;
   const dateString = day
-    ? date.toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      })
-    : label;
+    ? format(date, 'dd EEEE MMMM yyyy')
+    : label ?? format(date, 'MMM yyyy');
 
   return (
     <div className='rounded-lg border bg-background p-3 shadow-sm min-w-[180px]'>
