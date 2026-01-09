@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   return (
     <div className='h-full bg-background'>
       <div className='border-b bg-card'>
-        <div className='container flex flex-wrap items-center justify-between px-6 py-8 mx-auto'>
+        <div className='container flex flex-wrap items-center justify-between px-6 py-8 mx-auto gap-4'>
           <p className='text-3xl font-bold'>Hello, {user?.name}! 👋 </p>
           <div className='flex items-center gap-3'>
             <CreatTransactionDialog type={'income'}>

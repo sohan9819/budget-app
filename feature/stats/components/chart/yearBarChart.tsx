@@ -42,6 +42,7 @@ export function YearHistoryBarChart({
       </CardHeader>
 
       <CardContent>
+        {/*  make height to min-h-[300px] to make it more responsive */}
         <ChartContainer
           config={historyBarChartConfig}
           className='h-[300px] w-full'>
