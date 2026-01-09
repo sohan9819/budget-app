@@ -63,11 +63,11 @@ export const History = () => {
 
   return (
     <>
-      <div className='container flex flex-wrap items-end justify-between gap-2 py-6 mx-auto px-6'>
+      <div className='container flex flex-wrap items-end justify-between gap-2 py-6 mx-auto px-6 sm:hidden md:flex'>
         <h2 className='text-3xl font-bold'>History</h2>
       </div>
 
-      <div className='mx-auto px-4'>
+      <div className='mx-auto px-4 sm:hidden md:block'>
         <Card className='mt-2 w-full'>
           <CardHeader>
             <CardTitle className='grid grid-flow-row justify-between gap-2 md:grid-flow-col'>
