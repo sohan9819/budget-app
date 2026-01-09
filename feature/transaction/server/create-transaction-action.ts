@@ -19,9 +19,9 @@ export const createTransaction = async (
         ...transactionFormData,
         userId: user.id,
       };
-      const day = newTransaction.date.getDate();
-      const month = newTransaction.date.getMonth();
-      const year = newTransaction.date.getFullYear();
+      const day = newTransaction.date.getUTCDate();
+      const month = newTransaction.date.getUTCMonth();
+      const year = newTransaction.date.getUTCFullYear();
 
       const income =
         newTransaction.type === 'income' ? newTransaction.amount : 0;

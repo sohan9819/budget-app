@@ -45,7 +45,7 @@ import {
 } from '@/feature/transaction/schema';
 import { TransactionType } from '@/feature/transaction/types';
 import { CurrencyIcon } from '@/feature/user-settings/components/currency-icon';
-import { cn } from '@/lib/utils';
+import { cn, DateToUTCDate } from '@/lib/utils';
 
 interface CreatTransactionDialogProps {
   children: ReactNode;
@@ -97,7 +97,7 @@ export const CreatTransactionDialog = ({
       toast.loading('Creating transaction...', {
         id: 'create-transaction',
       });
-      createTransaction(values);
+      createTransaction({ ...values, date: DateToUTCDate(values.date) });
     },
     [createTransaction],
   );
