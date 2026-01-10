@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { differenceInDays, startOfMonth } from 'date-fns';
 import { atom, useAtom, useAtomValue } from 'jotai';
